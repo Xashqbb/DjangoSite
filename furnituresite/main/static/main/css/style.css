@@ -1,0 +1,49 @@
+body{
+    background: #2c2c2c;
+}
+.nav-link {
+    font-size: 20px;
+    margin-left: 10px;
+}
+.small-logo {
+    width: 200px;
+    height: auto;
+    margin-left: -80px;
+}
+
+main .features{
+    float: left;
+    color: #fff;
+    margin-top: 100px;
+    text-align: center;
+    width: 75%;
+}
+main .features h1{font-size: 50px;}
+main .features p{max-width: 400px; margin: 20px auto }
+
+footer {
+    background: #181818;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}
+
+.footer-icons {
+    font-size: 24px;
+    margin-top: 10px;
+}
+
+.footer-icon {
+    color: #fff;
+    margin: 0 10px;
+    text-decoration: none;
+    transition: transform .3s ease;
+}
+
+.footer-icon:hover {
+    color: #eb5959;
+    transform: scale(1.2);
+}
