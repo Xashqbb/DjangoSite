@@ -17,32 +17,6 @@ h1,h2,h3,h4,h5,h6{
 	color:hsl(0, 0%, 30%);
 }
 
-footer {
-    background: #373737;
-    color: #fff;
-    text-align: center;
-    padding: 10px;
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-}
-
-.footer-icons {
-    font-size: 24px;
-    margin-top: 10px;
-}
-
-.footer-icon {
-    color: #fff;
-    margin: 0 10px;
-    text-decoration: none;
-    transition: transform .3s ease;
-}
-
-.footer-icon:hover {
-    color: #eb5959;
-    transform: scale(1.2);
-}
 .icon-cart {
     font-size: 30px;
     color: #ffffff;
