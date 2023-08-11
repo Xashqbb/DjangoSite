@@ -6,7 +6,7 @@ class FurnitureProduct(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     photo = models.ImageField(upload_to='main/static/main/img/',null=True,blank=True)
     article = models.CharField(max_length=50)
-    model_3d = models.FileField(upload_to='3d_models/', blank=True, null=True)
+    model_3d = models.FileField(upload_to='main/static/main/3d_models/', blank=True, null=True)
     color = models.CharField(max_length=50,null=True)
 
     def __str__(self):
