@@ -1,0 +1,21 @@
+{% extends 'main/main.html' %}
+{% load static %}
+{% block bodycontent %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="box-element product-detail">
+                    <img class="product-image" src="{{ product.imageURL }}">
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="box-element product-info">
+                    <h3>{{ product.name }}</h3>
+                    <p>{{ product.description }}</p>
+                    <p><strong>Price: ${{ product.price|floatformat:2 }}</strong></p>
+                    <button data-product={{product.id}} data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
