@@ -15,3 +15,9 @@ def furniture_store(request):
     return render(request,'furniturestore/furniture_store.html',context)
 
 
+def product_detail(request, product_id):
+    data = cartData(request)
+    cartItems = data['cartItems']
+    product = FurnitureProduct.objects.get(id=product_id)
+    context = {'product': product,'cartItems':cartItems}
+    return render(request, 'furniturestore/product_detail.html', context)
