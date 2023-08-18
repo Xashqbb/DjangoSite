@@ -1,4 +1,8 @@
 from django.db import models
+from django.urls import reverse
+
+
+
 
 class FurnitureProduct(models.Model):
     name = models.CharField(max_length=100)
@@ -8,6 +12,7 @@ class FurnitureProduct(models.Model):
     article = models.CharField(max_length=50)
     model_3d = models.FileField(upload_to='main/static/main/3d_models/', blank=True, null=True)
     color = models.CharField(max_length=50,null=True)
+
 
     def __str__(self):
         return self.name
