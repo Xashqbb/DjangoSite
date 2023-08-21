@@ -13,6 +13,7 @@
                     <h3>{{ product.name }}</h3>
                     <p>{{ product.description }}</p>
                     <p><strong>Price: ${{ product.price|floatformat:2 }}</strong></p>
+                    <a class="btn btn-outline-dark" href="{% url 'furniture_store' %}">&#x2190; Back to store</a>
                     <button data-product={{product.id}} data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button>
                 </div>
             </div>
