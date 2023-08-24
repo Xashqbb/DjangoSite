@@ -29,3 +29,13 @@ class FurnitureProduct(models.Model):
         except:
             url = ''
         return url
+
+def image_folder_path(instance, filename):
+    return f'main/static/main/img/img_for_product/{instance.article}/{filename}'
+
+class AdditionalImage(models.Model):
+    product = models.ForeignKey(FurnitureProduct, related_name='additional_images', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='additional_images/')
+
+    def __str__(self):
+        return f"Additional Image for {self.product.name}"
