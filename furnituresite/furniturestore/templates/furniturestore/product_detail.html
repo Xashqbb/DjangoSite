@@ -25,7 +25,7 @@
         <div class="col-lg-6">
             <div class="box-element product-info">
                 <h3>{{ product.name }}</h3>
-                <p>{{ product.description }}</p>
+                <p>{{ product.description|linebreaks }}</p>
                 <p><strong>Price: ${{ product.price|floatformat:0 }}</strong></p>
                 <a class="btn btn-outline-dark" href="{% url 'furniture_store' %}">&#x2190; Back to store</a>
                 <button data-product={{product.id}} data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button>
