@@ -142,16 +142,17 @@ h1,h2,h3,h4,h5,h6{
 }
 /* Footer Styles */
 footer {
-    background-color: #232323;
+    background-color: #dcdcdc;
     color: white;
-    height: 120px;
     display: flex;
     align-items: center;
+    flex: 0 0 auto;
+    margin-top: 50px;
 }
 
 footer h5 {
     font-size: 1.2rem;
-    margin-bottom: 0;
+    margin-bottom: 5px;
 }
 
 footer a {
