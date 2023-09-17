@@ -63,6 +63,7 @@ h1,h2,h3,h4,h5,h6{
 .col-lg-4, .col-lg-6, .col-lg-8, .col-lg-12{
 	margin-top: 10px;
 	padding: 0 15px;
+	margin-bottom: 10px;
 }
 
 .btn{
@@ -147,8 +148,10 @@ footer {
     display: flex;
     align-items: center;
     flex: 0 0 auto;
-    margin-top: 50px;
-}
+    justify-content: center;
+    padding: 20px;
+    margin-top: 70px;
+    }
 
 footer h5 {
     font-size: 1.2rem;
@@ -180,5 +183,62 @@ footer .social-icons i {
 }
 
 footer .social-icons i:hover {
+    color: #800000;
+}
+/* Category */
+.category-dropdown {
+    position: relative;
+    display: inline-block;
+    text-align: center;
+    margin-left: -60px;
+}
+.category-button {
+    margin-top: 5px;
+    background-color: #800000; /* Цвет фона кнопки */
+    color: #fff; /* Цвет текста на кнопке */
+    font-size: 18px; /* Размер шрифта на кнопке */
+    padding: 10px 40px; /* Внутренний отступ кнопки */
+    border: none; /* Убрать границу кнопки */
+    border-radius: 5px; /* Скругление углов кнопки */
+}
+
+.category-button:hover {
+    background-color: #5c0a0a; /* Цвет фона при наведении */
+}
+.category-dropdown:hover .category-menu {
+    display: block;
+}
+
+.category-dropdown .category-menu {
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px 40px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    left: 50%; /* Разместить по центру */
+    transform: translateX(-50%); /* Центрировать относительно кнопки */
+    text-align: center; /* Выравнивание текста слева */
+
+}
+
+.category-menu ul {
+    list-style: none;
+    padding: 0;
+}
+
+.category-menu ul li {
+    margin: 5px 0;
+}
+
+.category-menu ul li a {
+    text-decoration: none;
+    color: #333;
+    transition: color 0.3s;
+    font-size : 20px;
+}
+
+.category-menu ul li a:hover {
     color: #800000;
 }
