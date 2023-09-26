@@ -25,6 +25,8 @@ class FurnitureProduct(models.Model):
     def __str__(self):
         return self.name
 
+
+
     @property
     def imageURL(self):
         try:
@@ -33,6 +35,13 @@ class FurnitureProduct(models.Model):
             url = ''
         return url
 
+    @property
+    def modelURL(self):
+        try:
+            url = self.model_3d.url
+        except:
+            url = ''
+        return url
 def image_folder_path(instance, filename):
     return f'main/static/main/img/img_for_product/additional_images/{instance.article}/{filename}'
 
