@@ -8,7 +8,7 @@
         <div class="col-lg-6">
             <div class="box-element product-detail">
                 <div class="slider-for">
-                    <img class="product-image" src="{{ product.imageURL }}">
+                    <img class="product-image" src="{{ product.imageURL }}" data-model-url="{{ product.modelURL|escapejs }}">
                     {% for image in product.additional_images.all %}
                         <img class="product-image" src="{{ image.image.url }}">
                     {% endfor %}
@@ -50,6 +50,21 @@
             centerMode: true,
             focusOnSelect: true
         });
-    });
 </script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.139.0/build/three.module.js",
+                "OrbitControls": "https://unpkg.com/three@0.139.0/examples/jsm/controls/OrbitControls.js",
+                "GLTFLoader": "https://unpkg.com/three@0.139.0/examples/jsm/loaders/GLTFLoader.js",
+                "OBJLoader" : "https://unpkg.com/three@0.139.0/examples/jsm/loaders/OBJLoader.js",
+                "MTLLoader": "https://unpkg.com/three@0.139.0/examples/jsm/loaders/MTLLoader.js",
+                "RectAreaLightHelper": "https://unpkg.com/three@0.139.0/examples/jsm/helpers/RectAreaLightHelper.js",
+                "RectAreaLightUniformsLib": "https://unpkg.com/three@0.139.0/examples/jsm/lights/RectAreaLightUniformsLib.js"
+            }
+        }
+    </script>
+<script src="{% static 'main/js/GLTFLoader.js' %}"></script>
+<script src="{% static 'main/js/OBJLoader.js' %}"></script>
+<script src="{% static 'main/js/3d.js' %}" type="module"></script>
 {% endblock %}
