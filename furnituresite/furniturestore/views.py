@@ -48,5 +48,13 @@ def product_detail(request, product_slug):
     data = cartData(request)
     cartItems = data['cartItems']
     product = get_object_or_404(FurnitureProduct, slug=product_slug)
-    context = {'product': product, 'cartItems': cartItems,}
+    context = {'product': product, 'cartItems': cartItems}
     return render(request, 'furniturestore/product_detail.html', context)
+
+
+def ThreeD_view(request, product_slug):
+    data = cartData(request)
+    cartItems = data['cartItems']
+    product = get_object_or_404(FurnitureProduct, slug=product_slug)
+    context = {'product': product, 'cartItems': cartItems}
+    return render(request, 'furniturestore/3d_view.html', context)
