@@ -51,7 +51,9 @@
             centerMode: true,
             focusOnSelect: true
         });
+    });
 </script>
+
 <script type="importmap">
         {
             "imports": {
@@ -69,7 +71,6 @@
     document.addEventListener("DOMContentLoaded", function () {
         var modelURLElement = document.querySelector('#view-3d-button');
         var model3DUrl = modelURLElement.getAttribute("data-3d-url");
-        console.log("URL 3D-модели:", model3DUrl);
     modelURLElement.addEventListener("click", function () {
         // Navigate to the 3D model view page using model3DUrl
         window.location.href = model3DUrl;

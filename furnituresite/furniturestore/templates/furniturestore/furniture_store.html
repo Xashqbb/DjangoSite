@@ -1,11 +1,12 @@
 {% extends 'main/main.html' %}
 {% load static %}
 {% block bodycontent %}
-    <div class="container">
-        <div class="category-dropdown">
-            <button class="btn btn-outline-secondary category-button">Category</button>
-            <div class="category-menu">
-                <ul>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-1">
+            <div class="category-sidebar">
+                <h3>Категорії</h3>
+                <ul class="category-menu">
                     <li {% if not current_category_slug %}class="active"{% endif %}>
                         <a href="{% url 'furniture_store' %}">Все</a>
                     </li>
@@ -17,51 +18,52 @@
                 </ul>
             </div>
         </div>
-
-        <div class="row">
-            {% for product in products %}
-                <div class="col-lg-4">
-                    <img class="thumbnail" src="{{ product.imageURL }}">
-                    <div class="box-element product">
-                        <h6><strong>{{ product.name }}</strong></h6>
-                        <hr>
-                        <button data-product={{ product.id }} data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button>
-                        <a class="btn btn-outline-success" href="{% url 'product_detail' product.slug %}">View</a>
-                        <h4 style="display: inline-block; float: right"><strong>${{ product.price|floatformat:0 }}</strong></h4>
+        <div class="col-lg-11 product-grid">
+            <div class="row">
+                {% for product in products %}
+                    <div class="col-lg-4">
+                        <img class="thumbnail" src="{{ product.imageURL }}">
+                        <div class="box-element product">
+                            <h6><strong>{{ product.name }}</strong></h6>
+                            <hr>
+                            <button data-product={{ product.id }} data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button>
+                            <a class="btn btn-outline-success" href="{% url 'product_detail' product.slug %}">View</a>
+                            <h4 style="display: inline-block; float: right"><strong>${{ product.price|floatformat:0 }}</strong></h4>
+                        </div>
                     </div>
-                </div>
-            {% endfor %}
+                {% endfor %}
+            </div>
+            <div class="pagination">
+                {% if products.has_previous %}
+                    <a href="?page={{ products.previous_page_number }}">« Previous Page</a>
+                {% endif %}
+
+                {% if products.number > 3 %}
+                    <a href="?page=1">1</a>
+                    {% if products.number > 4 %}
+                        <span>...</span>
+                    {% endif %}
+                {% endif %}
+
+                {% for num in products.paginator.page_range %}
+                    {% if products.number == num %}
+                        <span class="current-page">{{ num }}</span>
+                    {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
+                        <a href="?page={{ num }}">{{ num }}</a>
+                    {% endif %}
+                {% endfor %}
+
+                {% if products.has_next %}
+                    {% if products.number < products.paginator.num_pages|add:'-3' %}
+                        <span>...</span>
+                        <a href="?page={{ products.paginator.num_pages }}">{{ products.paginator.num_pages }}</a>
+                    {% elif products.number < products.paginator.num_pages|add:'-2' %}
+                        <a href="?page={{ products.paginator.num_pages }}">{{ products.paginator.num_pages }}</a>
+                    {% endif %}
+                    <a href="?page={{ products.next_page_number }}">Next Page »</a>
+                {% endif %}
+            </div>
         </div>
-        <div class="pagination">
-            {% if products.has_previous %}
-                <a href="?page={{ products.previous_page_number }}">« Previous Page</a>
-            {% endif %}
-
-            {% if products.number > 3 %}
-                <a href="?page=1">1</a>
-                {% if products.number > 4 %}
-                    <span>...</span>
-                {% endif %}
-            {% endif %}
-
-            {% for num in products.paginator.page_range %}
-                {% if products.number == num %}
-                    <span class="current-page">{{ num }}</span>
-                {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
-                    <a href="?page={{ num }}">{{ num }}</a>
-                {% endif %}
-            {% endfor %}
-
-            {% if products.has_next %}
-                {% if products.number < products.paginator.num_pages|add:'-3' %}
-                    <span>...</span>
-                    <a href="?page={{ products.paginator.num_pages }}">{{ products.paginator.num_pages }}</a>
-                {% elif products.number < products.paginator.num_pages|add:'-2' %}
-                    <a href="?page={{ products.paginator.num_pages }}">{{ products.paginator.num_pages }}</a>
-                {% endif %}
-                <a href="?page={{ products.next_page_number }}">Next Page »</a>
-            {% endif %}
-        </div>
-
     </div>
+</div>
 {% endblock %}
