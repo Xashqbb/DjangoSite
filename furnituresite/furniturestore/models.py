@@ -18,6 +18,9 @@ class FurnitureProduct(models.Model):
     model_3d = models.FileField(upload_to='main/static/main/3d_models/', blank=True, null=True)
     color = models.CharField(max_length=50,null=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
+    # discount_percentage = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, null=True, blank=True)
+
+
 
     def get_absolute_url(self):
         return reverse('product_detail', kwargs={'product_slug': self.slug})
