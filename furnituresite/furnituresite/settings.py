@@ -29,7 +29,12 @@ INSTALLED_APPS = [
     'main',
     'furniturestore',
     'cart',
+
+    'django_use_email_as_username.apps.DjangoUseEmailAsUsernameConfig',
+    'custom_user.apps.CustomUserConfig',
 ]
+
+AUTH_USER_MODEL = 'custom_user.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
