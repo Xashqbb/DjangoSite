@@ -1,4 +1,4 @@
-{% extends 'main/main.html' %}
+{% extends 'main/base.html' %}
 {% load static %}
 {% block bodycontent %}
 <div class="container">
@@ -60,7 +60,11 @@
 				<div class="cart-row">
 					<div style="flex:2"><img class="row-image" src="{{item.product.imageURL}}"></div>
 					<div style="flex:2"><p>{{item.product.name}}</p></div>
-					<div style="flex:1"><p>{{item.product.price|floatformat:2}}</p></div>
+					{% if item.product.discount_price %}
+							<div style="flex:1"><p>{{item.product.discount_price|floatformat:2}}</p></div>
+						{% else %}
+							<div style="flex:1"><p>{{item.product.price|floatformat:2}}</p></div>
+						{% endif %}
 					<div style="flex:1"><p>{{item.quantity}}</p></div>
 				</div>
 				{% endfor %}
