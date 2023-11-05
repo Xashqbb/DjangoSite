@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from furniturestore.models import FurnitureProduct
+from furniturestore.models import *
 
 class Customer(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
@@ -41,7 +41,10 @@ class OrderItem(models.Model):
 
     @property
     def get_total(self):
-        total = self.product.price*self.quantity
+        if self.product.discount_price:
+            total = self.product.discount_price * self.quantity
+        else:
+            total = self.product.price * self.quantity
         return total
 
 class ShippingAddres(models.Model):

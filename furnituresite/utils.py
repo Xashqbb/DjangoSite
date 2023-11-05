@@ -17,8 +17,10 @@ def cookieCart(request):
             cartItems += cart[i]['quantity']
 
             product = FurnitureProduct.objects.get(id=i)
-            total = (product.price * cart[i]['quantity'])
-
+            if product.discount_price:
+                total = (product.discount_price * cart[i]['quantity'])
+            else:
+                total = (product.price * cart[i]['quantity'])
             order['get_cart_total'] += total
             order['get_cart_items'] += cart[i]['quantity']
             item = {
@@ -26,6 +28,7 @@ def cookieCart(request):
                     'id': product.id,
                     'name': product.name,
                     'price': product.price,
+                    'discount_price': product.discount_price,
                     'imageURL': product.imageURL
                 },
                 'quantity': cart[i]['quantity'],
@@ -51,7 +54,6 @@ def cartData(request):
 
 def guestOrder(request,data):
     print('User is not logged in')
-
     print('COOKIES', request.COOKIES)
     name = data['form']['name']
     surname = data['form']['surname']
