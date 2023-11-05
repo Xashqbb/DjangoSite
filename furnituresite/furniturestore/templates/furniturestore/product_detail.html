@@ -1,4 +1,4 @@
-{% extends 'main/main.html' %}
+{% extends 'main/base.html' %}
 {% load static %}
 {% block bodycontent %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js" integrity="sha512-XtmMtDEcNz2j7ekrtHvOVR4iwwaD6o/FUJe6+Zq+HgcCsk3kj4uSQQR8weQ2QVj1o0Pk6PwYLohm206ZzNfubg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -26,10 +26,22 @@
             <div class="box-element product-info">
                 <h3>{{ product.name }}</h3>
                 <p>{{ product.description|linebreaks }}</p>
-                <p><strong>Price: ${{ product.price|floatformat:0 }}</strong></p>
-                <a class="btn btn-outline-dark" href="{% url 'furniture_store' %}">&#x2190; Back to store</a>
-                <button data-product={{product.id}} data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button>
-                <button id="view-3d-button" class="btn btn-outline-primary" data-3d-url="{% url '3d_view' product.slug %}?3d_url={{ product.modelURL }}&view_3d=true">View in 3D</button>
+                <div style="clear:both;">
+                    <p style="display: inline-block; float: left; margin-right: 10px;">Price:</p>
+                    {% if product.discount_price %}
+                    <h4 style="display: inline-block; float: left; color: red;"><strong>${{ product.discount_price|floatformat:0 }}</strong></h4>
+                    <span style="display: inline-block; float: left; margin-right: 10px;">
+                        <del>${{ product.price|floatformat:0 }}</del>
+                    </span>
+                    {% else %}
+                        <h4 style="display: inline-block; float: left"><strong>${{ product.price|floatformat:0 }}</strong></h4>
+                    {% endif %}
+                </div>
+                <div style="clear:both;">
+                    <a class="btn btn-outline-dark" href="{% url 'furniture_store' %}">&#x2190; Back to store</a>
+                    <button data-product={{product.id}} data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button>
+                    <button id="view-3d-button" class="btn btn-outline-primary" data-3d-url="{% url '3d_view' product.slug %}?3d_url={{ product.modelURL }}&view_3d=true">View in 3D</button>
+                </div>
             </div>
         </div>
     </div>
