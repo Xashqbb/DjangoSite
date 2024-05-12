@@ -73,8 +73,11 @@
                 {% else %}
                     <a href="{% url 'login' %}" class="btn btn-outline-light me-2">Login</a>
                 {% endif %}
+                 <a href="{% url 'cabinet' %}">
+                  <i class="fa-solid fa-user icon-profile" style="color: #ffffff; font-size: 30px; margin: 0 15 0 15;"></i>
+                </a>
                 <a href="{% url 'cart' %}">
-                  <i class="fa-solid fa-cart-shopping icon-cart" style="color: #ffffff;"></i>
+                  <i class="fa-solid fa-cart-shopping icon-cart" style="color: #ffffff; font-size: 30px;"></i>
                 </a>
                 <p id="cart-total">{{cartItems}}</p>
             </div>
