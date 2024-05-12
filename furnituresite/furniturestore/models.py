@@ -45,6 +45,7 @@ class FurnitureProduct(models.Model):
         except:
             url = ''
         return url
+
 def image_folder_path(instance, filename):
     return f'main/static/main/img/img_for_product/additional_images/{instance.article}/{filename}'
 

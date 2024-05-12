@@ -17,12 +17,6 @@ h1,h2,h3,h4,h5,h6{
 	color:hsl(0, 0%, 30%);
 }
 
-.icon-cart {
-    font-size: 30px;
-    color: #ffffff;
-}
-
-
 .box-element{
 	box-shadow:hsl(0, 0%, 80%) 0 0 16px;
 	background-color: #fff;
@@ -43,7 +37,9 @@ h1,h2,h3,h4,h5,h6{
 .product{
 	border-radius: 0 0 4px 4px;
 }
-
+.product-grid{
+    margin-left: 10px;
+}
 .bg-dark{
 	background-color: #232323 !important;
 }
@@ -69,7 +65,14 @@ h1,h2,h3,h4,h5,h6{
 .btn{
 	border-radius: 15;
 }
-
+.btn-outline-success{
+    color: #FF7100;
+    border-color: #FF7100;
+}
+.btn-outline-success:hover{
+    background-color: #FF7100;
+    border-color: #FF7100;
+}
 .row-image{
 	width: 100px;
 }
@@ -131,6 +134,9 @@ h1,h2,h3,h4,h5,h6{
     border-radius: 10px;
     box-shadow: 0 0 16px rgba(0, 0, 0, 0.1);
 }
+.box-element p {
+    font-size: 18px;
+}
 /*Slider*/
 .slider-for img{
     width: 100%;
@@ -149,7 +155,7 @@ h1,h2,h3,h4,h5,h6{
     background-color: #fff;
     padding: 15px;
     border-radius: 5px;
-    width: 180px;
+    width: 190px;
 }
 
 .category-sidebar h3 {
@@ -237,7 +243,7 @@ h1,h2,h3,h4,h5,h6{
 }
 
 .slider_section .detail-box h1 {
-  color: #24d278;
+  color: #FF7100;
   text-transform: uppercase;
 }
 
@@ -265,7 +271,7 @@ h1,h2,h3,h4,h5,h6{
 .slider_section .detail-box .btn-box .btn-1 {
   display: inline-block;
   padding: 6px 0;
-  background-color: #24d278;
+  background-color: #FF7100;
   color: #ffffff;
   -webkit-transition: all 0.3s;
   transition: all 0.3s;
@@ -277,8 +283,8 @@ h1,h2,h3,h4,h5,h6{
 
 .slider_section .detail-box .btn-box .btn-1:hover {
   background-color: transparent;
-  border-color: #24d278;
-  color: #24d278;
+  border-color: #FF7100;
+  color: #FF7100;
 }
 
 .slider_section .detail-box .btn-box .btn-2 {
@@ -316,10 +322,11 @@ h1,h2,h3,h4,h5,h6{
 
 .slider_section .img-container .img-box img {
   width: 100%;
+  height: 100%;
 }
 
 .slider_section .play_btn {
-  background-color: #24d278;
+  background-color: #FF7100;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -368,7 +375,7 @@ h1,h2,h3,h4,h5,h6{
   position: absolute;
   top: 50%;
   left: 50%;
-  background-color: #24d278;
+  background-color: #FF7100;
   opacity: 1;
   border-radius: 100%;
   -webkit-transform: translate(-50%, -50%);
@@ -422,7 +429,7 @@ h1,h2,h3,h4,h5,h6{
   width: 15px;
   height: 15px;
   border-radius: 100%;
-  background-color: #24d278;
+  background-color: #FF7100;
   opacity: 1;
   border: none;
   background-clip: unset;
@@ -454,7 +461,6 @@ h1,h2,h3,h4,h5,h6{
   display: block;
 }
 
-
 /*back ground section*/
 .hero_area {
   height: 100vh;
@@ -462,7 +468,9 @@ h1,h2,h3,h4,h5,h6{
   position: relative;
   background-repeat: no-repeat;
   overflow: hidden;
+  background-position: center 200%;
 }
+
 .hero_area::after {
   content: "";
   position: absolute;
@@ -472,4 +480,58 @@ h1,h2,h3,h4,h5,h6{
   height: 100%;
   background-image: url('../img/hero-side-bg.png');
   background-size: cover;
+}
+/*Стили для фильтра по цене */
+.price-filter-form label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.price-filter-form input {
+    width: 45%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.price-filter-form button {
+    margin-top: 10px;
+    width:100%;
+    padding: 10px;
+    background-color: #FF7100;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.price-filter-form button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.price-filter-form .error {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+/* Стили для фильтра по цене */
+#priceSlider .noUi-connect {
+    background: #FF7100;
+}
+#priceSlider.noUi-horizontal {
+    height: 20px;
+    background: #252525;
+    width: 97%;
+    margin-right: 5px;
+    margin-left: 2px;
+}
+
+.noUi-handle:hover {
+    background: #FF7100;
+    box-shadow: 0 0 5px #FF7100;
 }
