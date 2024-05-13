@@ -58,11 +58,11 @@ function init() {
             console.log('Error ->' + error)
         });
 
-        // Check if MTL file exists
-        const mtlLoader = new MTLLoader();
-        mtlLoader.load(view3d_url.replace('.obj', '.mtl'), function (materials) {
-            loader.setMaterials(materials); // Set materials if MTL file exists
-        });
+//        // Check if MTL file exists
+//        const mtlLoader = new MTLLoader();
+//        mtlLoader.load(view3d_url.replace('.obj', '.mtl'), function (materials) {
+//            loader.setMaterials(materials); // Set materials if MTL file exists
+//        });
     }
 
     // Model
