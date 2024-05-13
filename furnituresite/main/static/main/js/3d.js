@@ -2,14 +2,16 @@ import * as THREE from 'three';
 import { OrbitControls } from 'OrbitControls';
 import { OBJLoader } from 'OBJLoader';
 import { MTLLoader } from 'MTLLoader';
-import { RectAreaLightHelper } from 'RectAreaLightHelper'
+import { RectAreaLightHelper } from 'RectAreaLightHelper';
 import { RectAreaLightUniformsLib } from 'RectAreaLightUniformsLib';
 
 const urlParams = new URLSearchParams(window.location.search);
 const view3d_url = urlParams.get('3d_url');
 const view3D = urlParams.get('view_3d');
+let isRotating = false;
+let container = document.querySelector('.container');
+
 function init() {
-    let container = document.querySelector('.container');
     // Scene
     const scene = new THREE.Scene()
     scene.background = new THREE.Color("#E2DFE1");
@@ -36,43 +38,52 @@ function init() {
         scene.add(plain)
     }
 
-            // Model
-            {
-                var modelURL = view3d_url
-                const loader = new OBJLoader();
-                loader.load(modelURL, obj => {
-                    scene.add(obj);
-                },
-                function (xhr) {
-                    console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-                },
-                function (error) {
-                    console.log('Error ->' + error)
-                }
-                )
+    // Load your object using OBJLoader (assuming it's an OBJ file)
+    let currentRotatingObject;
+
+    function loadAndAddObject(url) {
+        const loader = new OBJLoader();
+        loader.load(url, obj => {
+            // Remove previous rotating object if it exists
+            if (currentRotatingObject) {
+                scene.remove(currentRotatingObject);
             }
+            currentRotatingObject = obj;
+            scene.add(obj);
+        },
+        function (xhr) {
+            console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+        },
+        function (error) {
+            console.log('Error ->' + error)
+        });
 
-            {
-                const light = new THREE.DirectionalLight(0xffffff, 1)
-                light.position.set(-2, 0, 10)
-                light.lookAt(0, -1, 0)
-                scene.add(light)
-
-                // Helper
-                // const helper = new THREE.DirectionalLightHelper(light, 5)
-                // scene.add(helper)
-            }
-
-    {
-        const light = new THREE.DirectionalLight(0xffffff, 1)
-        light.position.set(2, 0, 5)
-        light.lookAt(0, 1, 0)
-        scene.add(light)
+//        // Check if MTL file exists
+//        const mtlLoader = new MTLLoader();
+//        mtlLoader.load(view3d_url.replace('.obj', '.mtl'), function (materials) {
+//            loader.setMaterials(materials); // Set materials if MTL file exists
+//        });
     }
+
+    // Model
+    loadAndAddObject(view3d_url);
+
+    // Lights
+    const light1 = new THREE.DirectionalLight(0xffffff, 1)
+    light1.position.set(-2, 0, 10)
+    light1.lookAt(0, -1, 0)
+    scene.add(light1)
+
+    const light2 = new THREE.DirectionalLight(0xffffff, 1)
+    light2.position.set(2, 0, 5)
+    light2.lookAt(0, 1, 0)
+    scene.add(light2)
+
+
 
     // OrbitControls
     const controls = new OrbitControls(camera, renderer.domElement);
-    controls.autoRotate = true;
+    controls.autoRotate = false;
     controls.autoRotateSpeed = 5;
     controls.enableDamping = true;
 
@@ -86,14 +97,28 @@ function init() {
         renderer.setSize(window.innerWidth, window.innerHeight)
     }
 
+    // Keyboard controls for object rotation
+    document.addEventListener('keydown', (event) => {
+        switch (event.key) {
+            case 'a': // Toggle auto-rotation on 'A' key
+                isRotating = !isRotating;
+                break;
+            // ... (other arrow key controls for camera movement)
+        }
+    });
+
     // Animate
     function animate() {
         requestAnimationFrame(animate)
         controls.update();
+        if (isRotating && currentRotatingObject) {
+            currentRotatingObject.rotation.y += 0.01;
+        }
         renderer.render(scene, camera)
     }
-    animate()
+    animate();
 }
-if(view3D == 'true'){
-init()
+
+if (view3D == 'true') {
+    init();
 }

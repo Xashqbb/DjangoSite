@@ -5,6 +5,19 @@
     <div class="row">
         <div class="col-lg-1">
             <div class="category-sidebar">
+                <h3>Ціна</h3>
+                <form class="price-filter-form" method="get" action="{% url 'furniture_store' %}" onsubmit="return validatePriceFilter()">
+                    <div>
+                        <input type="text" id="min_price" name="min_price">
+                        - <input type="text" id="max_price" name="max_price">
+                    </div>
+                    <div id="priceSlider"></div>
+                    <button type="submit" id="filterButton" disabled>OK</button>
+                    {% if price_filter_form.errors %}
+                        <p class="error">{{ price_filter_form.errors.min_price }}</p>
+                        <p class="error">{{ price_filter_form.errors.max_price }}</p>
+                    {% endif %}
+                </form>
                 <h3>Категорії</h3>
                 <ul class="category-menu">
                     <li {% if not current_category_slug %}class="active"{% endif %}>
@@ -18,7 +31,7 @@
                 </ul>
             </div>
         </div>
-        <div class="col-lg-11 product-grid">
+        <div class="col-lg-10 product-grid">
             <div class="row">
                 {% for product in products %}
                     <div class="col-lg-4">
@@ -73,4 +86,76 @@
         </div>
     </div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js" integrity="sha512-UOJe4paV6hYWBnS0c9GnIRH8PLm2nFK22uhfAvsTIqd3uwnWsVri1OPn5fJYdLtGY3wB11LGHJ4yPU1WFJeBYQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.1/js.cookie.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.css" integrity="sha512-MKxcSu/LDtbIYHBNAWUQwfB3iVoG9xeMCm32QV5hZ/9lFaQZJVaXfz9aFa0IZExWzCpm7OWvp9zq9gVip/nLMg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    var priceSlider = document.getElementById('priceSlider');
+    var minPriceInput = document.getElementById('min_price');
+    var maxPriceInput = document.getElementById('max_price');
+    var filterButton = document.getElementById('filterButton');
+    var priceFilterForm = document.querySelector('.price-filter-form');
+
+    // Получаем значения из куков
+    var initialMinPrice = parseFloat(getCookie('min_price')) || {{ min_price }};
+    var initialMaxPrice = parseFloat(getCookie('max_price')) || {{ max_price }};
+
+    noUiSlider.create(priceSlider, {
+        start: [initialMinPrice, initialMaxPrice],
+        connect: true,
+        range: {
+            'min': {{ min_price }},
+            'max': {{max_price}},
+        },
+    });
+
+    // Event handler для обновления слайдера
+    priceSlider.noUiSlider.on('update', function (values, handle) {
+        var value = values[handle];
+
+        if (handle === 0) {
+            minPriceInput.value = value;
+        } else {
+            maxPriceInput.value = value;
+        }
+
+        // Enable кнопку "OK" после изменения значений
+        filterButton.disabled = false;
+    });
+
+    // Event handler для отправки формы
+    priceFilterForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        // Обновляем значения в куках
+        setCookie('min_price', minPriceInput.value);
+        setCookie('max_price', maxPriceInput.value);
+
+        this.submit();
+    });
+
+    // Обновляем значения при загрузке страницы
+    minPriceInput.value = initialMinPrice;
+    maxPriceInput.value = initialMaxPrice;
+
+    // Функция для установки значения в куки
+    function setCookie(name, value) {
+        document.cookie = name + '=' + value + '; path=/';
+    }
+
+    // Функция для получения значения из куков
+    function getCookie(name) {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.indexOf(name + '=') === 0) {
+                return cookie.substring(name.length + 1);
+            }
+        }
+        return null;
+    }
+});
+</script>
+
 {% endblock %}

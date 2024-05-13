@@ -56,3 +56,7 @@ class LoginForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput(attrs={
         'placeholder': 'Enter your Password',
         'class': '.form input', }))
+
+class PriceFilterForm(forms.Form):
+    min_price = forms.DecimalField(label='Min price', required=False)
+    max_price = forms.DecimalField(label='Max price', required=False)
