@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate,login,logout
 from django.http import HttpResponse
 from django.shortcuts import render,redirect
+from django.contrib.auth.hashers import make_password
 from cart.models import *
 from .models import *
 from utils import cookieCart,cartData
@@ -16,10 +17,6 @@ def home_page(request):
     context = {'products': products, 'cartItems': cartItems}
     return render(request,'main/main.html',context)
 
-# signup page
-from django.contrib.auth.hashers import make_password
-
-# ...
 
 def user_signup(request):
     if request.method == 'POST':
@@ -70,4 +67,13 @@ def user_login(request):
 def user_logout(request):
     logout(request)
     return redirect('login')
+
+def cabinet(request):
+    data = cartData(request)
+    cartItems = data['cartItems']
+    user = request.user
+    user_info = Customer.objects.get(user=user)
+    products = FurnitureProduct.objects.all()
+    context = {'products': products, 'cartItems': cartItems,'user':user_info}
+    return render(request,'main/cabinet.html',context)
 
