@@ -103,6 +103,9 @@ function init() {
             case 'a': // Toggle auto-rotation on 'A' key
                 isRotating = !isRotating;
                 break;
+            case 'ф': // Toggle auto-rotation on 'A' key
+                isRotating = !isRotating;
+                break;
             // ... (other arrow key controls for camera movement)
         }
     });
