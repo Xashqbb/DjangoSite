@@ -45,6 +45,7 @@ def user_signup(request):
 
 # login page
 def user_login(request):
+    invalid_login = False
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
@@ -58,10 +59,10 @@ def user_login(request):
                 else:
                     pass
             else:
-                return HttpResponse('Invalid login')
+                invalid_login = True
     else:
         form = LoginForm()
-    return render(request, 'main/login.html', {'form': form})
+    return render(request, 'main/login.html', {'form': form, 'invalid_login': invalid_login})
 
 # logout page
 def user_logout(request):
@@ -73,7 +74,12 @@ def cabinet(request):
     cartItems = data['cartItems']
     user = request.user
     user_info = Customer.objects.get(user=user)
+    if user_info.bonus is None:
+        user_info.bonus = 0
+        user_info.save()
+    bonus_balance = user_info.bonus
     products = FurnitureProduct.objects.all()
-    context = {'products': products, 'cartItems': cartItems,'user':user_info}
-    return render(request,'main/cabinet.html',context)
+    context = {'products': products, 'cartItems': cartItems, 'user': user_info, 'bonus_balance': bonus_balance}
+    return render(request, 'main/cabinet.html', context)
+
 

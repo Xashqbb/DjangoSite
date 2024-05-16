@@ -1,7 +1,7 @@
 {% extends 'main/base.html' %}
 {% load static %}
 {% block bodycontent %}
-<body>
+<body xmlns="http://www.w3.org/1999/html">
   <div class="container mt-4 mb-4 p-3 d-flex justify-content-center">
     <div class="card p-4">
         <div class=" image d-flex flex-column justify-content-center align-items-center">
@@ -16,16 +16,19 @@
 
             </div>
           <div class="text mt-3">
-            <span>Eleanor Pena is a creator of minimalistic x bold graphics and digital artwork.
-              <br><br> Artist/ Creative Director by Day #NFT minting@ with FND night.
+            <span>This is your bonus balance, you can use it to buy products</span>:
+              <br>${{ bonus_balance }}
+              <span style="color: #black ;text-shadow: 0 0 5px #ff00ff, 0 0 10px #ff00ff, 0 0 15px #ff00ff;">
+                <br>Buy products and get 5% bonus from the price of the product you buy<br>
+              </span>
             </span>
           </div>
           <div class="gap-3 mt-3 icons d-flex flex-row justify-content-center align-items-center">
           </div>
           <div class=" px-2 rounded mt-4 date ">
-            <span class="join">Joined May,2021</span>
+            <span class="join">TamTumba, 2024</span>
           </div>
-          <button class="btn1 btn-dark">Edit Profile</button>
+<!--          <button class="btn1 btn-dark">Edit Profile</button>-->
         </div>
     </div>
   </div>
