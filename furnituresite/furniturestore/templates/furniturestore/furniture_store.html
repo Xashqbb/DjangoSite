@@ -3,7 +3,7 @@
 {% block bodycontent %}
 <div class="container">
     <div class="row">
-        <div class="col-lg-1">
+        <div class="col-lg-1 col-md-2 col-sm-3 order-lg-first">
             <div class="category-sidebar">
                 <h3>Ціна</h3>
                 <form class="price-filter-form" method="get" action="{% url 'furniture_store' %}" onsubmit="return validatePriceFilter()">
@@ -31,7 +31,7 @@
                 </ul>
             </div>
         </div>
-        <div class="col-lg-10 product-grid">
+        <div class="col-lg-10 col-md-10 col-sm-9 order-lg-last product-grid" style="margin-left: 50px">
             <div class="row">
                 {% for product in products %}
                     <div class="col-lg-4">
@@ -39,12 +39,17 @@
                         <div class="box-element product">
                             <h6><strong>{{ product.name }}</strong></h6>
                             <hr>
-                            <button data-product={{ product.id }} data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button>
+                            {% if not product.in_stock %}
+                                <p style="display: inline-block; float: left; color: red; margin: 0px 10px 0px 0px;">Out of Stock :(</p>
+                            {%else%}
+                                <button data-product={{ product.id }} data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button>
+                            {% endif %}
                             <a class="btn btn-outline-success" href="{% url 'product_detail' product.slug %}">View</a>
                              {% if product.discount_price %}
                                 <span style="display: inline-block; float: right">
                                     <del>${{ product.price|floatformat:0 }}</del>
                                 </span>
+
                                 <h4 style="display: inline-block; float: right; color: red;"><strong>${{ product.discount_price|floatformat:0 }}</strong></h4>
                             {% else %}
                             <h4 style="display: inline-block; float: right"><strong>${{ product.price|floatformat:0 }}</strong></h4>
@@ -53,35 +58,22 @@
                     </div>
                 {% endfor %}
             </div>
-            <div class="pagination">
-                {% if products.has_previous %}
-                    <a href="?page={{ products.previous_page_number }}">« Previous Page</a>
-                {% endif %}
-
-                {% if products.number > 3 %}
-                    <a href="?page=1">1</a>
-                    {% if products.number > 4 %}
-                        <span>...</span>
+            <div class="pagination-wrapper" >
+                <div class="pagination">
+                    {% if products.has_previous %}
+                        <a href="?page={{ products.previous_page_number }}">« Попередня сторінка</a>
                     {% endif %}
-                {% endif %}
-
-                {% for num in products.paginator.page_range %}
-                    {% if products.number == num %}
-                        <span class="current-page">{{ num }}</span>
-                    {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
-                        <a href="?page={{ num }}">{{ num }}</a>
+                    {% for num in products.paginator.page_range %}
+                        {% if products.number == num %}
+                            <span class="current-page">{{ num }}</span>
+                        {% else %}
+                            <a href="?page={{ num }}">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+                    {% if products.has_next %}
+                        <a href="?page={{ products.next_page_number }}">Наступна сторінка »</a>
                     {% endif %}
-                {% endfor %}
-
-                {% if products.has_next %}
-                    {% if products.number < products.paginator.num_pages|add:'-3' %}
-                        <span>...</span>
-                        <a href="?page={{ products.paginator.num_pages }}">{{ products.paginator.num_pages }}</a>
-                    {% elif products.number < products.paginator.num_pages|add:'-2' %}
-                        <a href="?page={{ products.paginator.num_pages }}">{{ products.paginator.num_pages }}</a>
-                    {% endif %}
-                    <a href="?page={{ products.next_page_number }}">Next Page »</a>
-                {% endif %}
+                </div>
             </div>
         </div>
     </div>
@@ -157,5 +149,4 @@
     }
 });
 </script>
-
 {% endblock %}

@@ -34,7 +34,7 @@ def furniture_store(request, category_slug=None):
             if max_price is not None:
                 products = products.filter(price__lte=max_price)
 
-    paginator = Paginator(products, 10)
+    paginator = Paginator(products, 6)
     page = request.GET.get('page')
 
     try:

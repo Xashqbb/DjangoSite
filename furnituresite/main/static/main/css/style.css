@@ -37,8 +37,20 @@ h1,h2,h3,h4,h5,h6{
 .product{
 	border-radius: 0 0 4px 4px;
 }
-.product-grid{
-    margin-left: 10px;
+.product-grid {
+    margin-left: 50px; /* Видаліть цей стиль, якщо він не потрібен */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+.product-grid .row {
+    width: 100%;
+}
+
+.product-grid .col-lg-4 {
+    width: calc(33.33% - 20px);
+    margin-bottom: 20px;
+    padding: 0 10px;
 }
 .bg-dark{
 	background-color: #232323 !important;
@@ -155,7 +167,9 @@ h1,h2,h3,h4,h5,h6{
     background-color: #fff;
     padding: 15px;
     border-radius: 5px;
-    width: 190px;
+    width: 200px;
+    overflow-x: auto; /* Для горизонтальної прокрутки, якщо необхідно */
+    white-space: nowrap; /* Якщо вибір категорій має багато елементів */
 }
 
 .category-sidebar h3 {
@@ -179,13 +193,14 @@ h1,h2,h3,h4,h5,h6{
 }
 
 .category-menu a:hover {
-    color: #FF7100; /* Измените цвет при наведении */
+    color: #FF7100;
 }
 
 .active a {
-    font-weight: bold; /* Для подсветки активной категории */
-    color: #FF7100; /* Измените цвет активной категории */
+    font-weight: bold;
+    color: #FF7100;
 }
+
 /*slider section*/
 .slider_section {
   height: calc(90% - 70px);
@@ -529,9 +544,356 @@ h1,h2,h3,h4,h5,h6{
     width: 97%;
     margin-right: 5px;
     margin-left: 2px;
-}
 
+}
 .noUi-handle:hover {
     background: #FF7100;
     box-shadow: 0 0 5px #FF7100;
+}
+/*  Pagination styles */
+    .pagination {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .pagination a, .pagination span {
+        display: inline-block;
+        padding: 5px 10px;
+        margin: 0 2px;
+        border: 1px solid #ccc;
+        background-color: #f8f9fa;
+        color: #343a40;
+        text-decoration: none;
+    }
+
+    .pagination .current-page {
+        font-weight: bold;
+        background-color: #007bff;
+        color: #fff;
+        border-color: #007bff;
+    }
+
+    .pagination a:hover {
+        background-color: #dee2e6;
+    }
+
+    .pagination span {
+        pointer-events: none;
+    }
+
+.pagination-wrapper {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.pagination {
+    display: inline-block;
+}
+
+.pagination a, .pagination .current-page {
+    display: inline-block;
+    padding: 5px 10px;
+    margin: 0 2px;
+    border: 1px solid #ccc;
+    background-color: #f8f9fa;
+    color: #343a40;
+    text-decoration: none;
+}
+
+.pagination .current-page {
+    font-weight: bold;
+    background-color: #007bff;
+    color: #fff;
+    border-color: #007bff;
+}
+
+.pagination a:hover {
+    background-color: #dee2e6;
+}
+
+
+
+/* Додаткові адаптивні стилі для різних розмірів екрану */
+/* Для екранів шириною менше 768px */
+@media (max-width: 767px) {
+    .nav-link {
+        font-size: 16px;
+        margin-left: 5px;
+    }
+    .small-logo {
+        width: 150px;
+        margin-left: -40px;
+    }
+    h1, h2, h3, h4, h5, h6 {
+        font-size: 18px;
+    }
+    .box-element p {
+        font-size: 16px;
+    }
+    .col-lg-4, .col-lg-6, .col-lg-8, .col-lg-12 {
+        padding: 0 10px;
+    }
+    .row-image {
+        width: 80px;
+    }
+    .form-field {
+        width: 200px;
+    }
+}
+
+/* Для екранів шириною від 768px до 991px */
+@media (min-width: 768px) and (max-width: 991px) {
+    .nav-link {
+        font-size: 18px;
+    }
+    .small-logo {
+        width: 170px;
+        margin-left: -60px;
+    }
+    h1, h2, h3, h4, h5, h6 {
+        font-size: 24px;
+    }
+    .box-element p {
+        font-size: 20px;
+    }
+    .col-lg-4, .col-lg-6, .col-lg-8, .col-lg-12 {
+        margin-top: 15px;
+        padding: 0 10px;
+    }
+    .row-image {
+        width: 90px;
+    }
+    .form-field {
+        width: 220px;
+    }
+}
+
+/* Для екранів шириною 992px і більше */
+@media (min-width: 992px) {
+    .nav-link {
+        font-size: 20px;
+    }
+    .small-logo {
+        width: 200px;
+        margin-left: -80px;
+    }
+    h1, h2, h3, h4, h5, h6 {
+        font-size: 28px;
+    }
+    .box-element p {
+        font-size: 22px;
+    }
+    .col-lg-4, .col-lg-6, .col-lg-8, .col-lg-12 {
+        margin-top: 10px;
+        padding: 0 15px;
+    }
+    .row-image {
+        width: 100px;
+    }
+    .form-field {
+        width: 250px;
+    }
+}
+@media (max-width: 1440px) {
+    .category-sidebar {
+        width: auto;
+        overflow-x: auto;
+    }
+    .product-grid .col-lg-4 {
+        width: calc(50% - 20px); /* Щоб розділити на 2 колонки */
+    }
+}
+
+@media (max-width: 767px) {
+    .product-grid .col-lg-4 {
+        width: calc(100% - 20px); /* На маленьких екранах товари відображатимуться на весь екран */
+    }
+}
+
+@media (max-width: 1400px) {
+    .category-sidebar {
+        position: relative;
+        width: calc(100% - 20px);
+        margin: 0 auto;
+        margin-top: 20px; /* Додайте бажану відстань від nav menu */
+    }
+
+    .category-sidebar h3 {
+        font-size: 16px; /* Зменште розмір тексту заголовків */
+    }
+
+    .category-sidebar ul.category-menu {
+        margin-top: 10px;
+    }
+
+    .category-sidebar ul.category-menu li {
+        margin-bottom: 5px;
+    }
+}
+
+@media (max-width: 767px) {
+    .category-sidebar {
+        width: 100%;
+    }
+
+    .category-sidebar h3 {
+        font-size: 14px; /* Додайте ще одне зменшення розміру тексту для мобільних пристроїв */
+    }
+}
+@media (max-width: 1400px) {
+    .category-sidebar {
+        top: 0;
+        bottom : 0;
+        left: 100%; /* розміщуємо в центрі */
+        transform: translateX(-50%); /* центруємо відносно батьківського блоку */
+        width: 200px;
+        z-index: 1; /* забезпечуємо, щоб sidebar був вище, ніж навігаційне меню */
+    }
+
+    .category-menu li {
+    display: inline-block; /* Змінюємо стиль відображення на inline-block */
+    margin-right: 10px; /* Додаємо відступ між елементами */
+    }
+    .price-filter-form label {
+    font-size: 14px; /* Зменшуємо розмір шрифту міток */
+    }
+
+    .price-filter-form input {
+        width: 40%; /* Зменшуємо ширину полів введення */
+        padding: 6px; /* Зменшуємо внутрішній відступ */
+    }
+
+    .price-filter-form button {
+        margin-top: 10px;
+        width: 60%; /* Зменшуємо ширину кнопки */
+        padding: 8px; /* Зменшуємо внутрішній відступ */
+        font-size: 14px; /* Зменшуємо розмір шрифту кнопки */
+    }
+
+    .product-grid {
+        margin-top: 10px; /* збільшуємо відступ товарів зверху, щоб вони не перекривали sidebar та навігаційне меню */
+    }
+
+    .navbar {
+        position: relative;
+        z-index: 0; /* забезпечуємо, щоб навігаційне меню було позаду sidebar */
+    }
+}
+
+@media (max-width: 1024px) {
+    .category-sidebar {
+        top: 0;
+        bottom : 0;
+        left: 50%; /* розміщуємо в центрі */
+        transform: translateX(-50%); /* центруємо відносно батьківського блоку */
+        width: 250%;
+        z-index: 1; /* забезпечуємо, щоб sidebar був вище, ніж навігаційне меню */
+    }
+
+    .category-menu li {
+    display: inline-block; /* Змінюємо стиль відображення на inline-block */
+    margin-right: 10px; /* Додаємо відступ між елементами */
+    }
+    .price-filter-form label {
+    font-size: 14px; /* Зменшуємо розмір шрифту міток */
+    }
+
+    .price-filter-form input {
+        width: 40%; /* Зменшуємо ширину полів введення */
+        padding: 6px; /* Зменшуємо внутрішній відступ */
+    }
+
+    .price-filter-form button {
+        margin-top: 10px;
+        width: 60%; /* Зменшуємо ширину кнопки */
+        padding: 8px; /* Зменшуємо внутрішній відступ */
+        font-size: 14px; /* Зменшуємо розмір шрифту кнопки */
+    }
+
+    .product-grid {
+        margin-top: 10px; /* збільшуємо відступ товарів зверху, щоб вони не перекривали sidebar та навігаційне меню */
+    }
+
+    .navbar {
+        position: relative;
+        z-index: 0; /* забезпечуємо, щоб навігаційне меню було позаду sidebar */
+    }
+}
+@media (max-width: 768px) {
+    .category-sidebar {
+        top: 0;
+        bottom : 0;
+        left: 325%; /* розміщуємо в центрі */
+        transform: translateX(-50%); /* центруємо відносно батьківського блоку */
+        width: 250%;
+        z-index: 1; /* забезпечуємо, щоб sidebar був вище, ніж навігаційне меню */
+    }
+
+    .category-menu li {
+    display: inline-block; /* Змінюємо стиль відображення на inline-block */
+    margin-right: 10px; /* Додаємо відступ між елементами */
+    }
+    .price-filter-form label {
+    font-size: 14px; /* Зменшуємо розмір шрифту міток */
+    }
+
+    .price-filter-form input {
+        width: 40%; /* Зменшуємо ширину полів введення */
+        padding: 6px; /* Зменшуємо внутрішній відступ */
+    }
+
+    .price-filter-form button {
+        margin-top: 10px;
+        width: 60%; /* Зменшуємо ширину кнопки */
+        padding: 8px; /* Зменшуємо внутрішній відступ */
+        font-size: 14px; /* Зменшуємо розмір шрифту кнопки */
+    }
+
+    .product-grid {
+        margin-top: 10px; /* збільшуємо відступ товарів зверху, щоб вони не перекривали sidebar та навігаційне меню */
+    }
+
+    .navbar {
+        position: relative;
+        z-index: 0; /* забезпечуємо, щоб навігаційне меню було позаду sidebar */
+    }
+}
+@media (max-width: 450px) and (min-width: 320px){
+    .category-sidebar {
+        top: 0;
+        bottom : 0;
+        left: 50%; /* розміщуємо в центрі */
+        transform: translateX(-50%); /* центруємо відносно батьківського блоку */
+        width: 85%;
+        z-index: 1; /* забезпечуємо, щоб sidebar був вище, ніж навігаційне меню */
+    }
+
+    .category-menu li {
+    display: inline-block; /* Змінюємо стиль відображення на inline-block */
+    margin-right: 10px; /* Додаємо відступ між елементами */
+    }
+    .price-filter-form label {
+    font-size: 14px; /* Зменшуємо розмір шрифту міток */
+    }
+
+    .price-filter-form input {
+        width: 40%; /* Зменшуємо ширину полів введення */
+        padding: 6px; /* Зменшуємо внутрішній відступ */
+    }
+
+    .price-filter-form button {
+        margin-top: 10px;
+        width: 60%; /* Зменшуємо ширину кнопки */
+        padding: 8px; /* Зменшуємо внутрішній відступ */
+        font-size: 14px; /* Зменшуємо розмір шрифту кнопки */
+    }
+
+    .product-grid {
+        margin-top: 10px; /* збільшуємо відступ товарів зверху, щоб вони не перекривали sidebar та навігаційне меню */
+    }
+
+    .navbar {
+        position: relative;
+        z-index: 0; /* забезпечуємо, щоб навігаційне меню було позаду sidebar */
+    }
 }

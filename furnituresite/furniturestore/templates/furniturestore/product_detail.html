@@ -44,7 +44,9 @@
                     {% else %}
                         <button data-product="{{ product.id }}" data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button>
                     {% endif %}
-                    <button id="view-3d-button" class="btn btn-outline-primary" data-3d-url="{% url '3d_view' product.slug %}?3d_url={{ product.modelURL }}&view_3d=true">View in 3D</button>
+                    {% if product.modelURL %}
+                        <button id="view-3d-button" class="btn btn-outline-primary" data-3d-url="{% url '3d_view' product.slug %}?3d_url={{ product.modelURL }}&view_3d=true">View in 3D</button>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -82,15 +84,17 @@
                 "RectAreaLightUniformsLib": "https://unpkg.com/three@0.139.0/examples/jsm/lights/RectAreaLightUniformsLib.js"
             }
         }
-    </script>
+</script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         var modelURLElement = document.querySelector('#view-3d-button');
-        var model3DUrl = modelURLElement.getAttribute("data-3d-url");
-    modelURLElement.addEventListener("click", function () {
-        // Navigate to the 3D model view page using model3DUrl
-        window.location.href = model3DUrl;
-    });
+        if(modelURLElement){
+            var model3DUrl = modelURLElement.getAttribute("data-3d-url");
+            modelURLElement.addEventListener("click", function () {
+                // Navigate to the 3D model view page using model3DUrl
+                window.location.href = model3DUrl;
+            });
+        }
     });
 </script>
 <script src="{% static 'main/js/3d.js' %}" type="module"></script>
