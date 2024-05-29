@@ -897,3 +897,21 @@ h1,h2,h3,h4,h5,h6{
         z-index: 0; /* забезпечуємо, щоб навігаційне меню було позаду sidebar */
     }
 }
+
+/* reset password messages */
+
+.messages {
+    margin: 20px 0;
+}
+
+.messages .success {
+    color: green;
+}
+
+.messages .error {
+    color: red;
+}
+
+.messages .info {
+    color: blue;
+}

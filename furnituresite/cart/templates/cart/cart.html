@@ -14,14 +14,15 @@
 							<th><h5>Total: <strong>{{order.get_cart_total|floatformat:2}} $</strong></h5></th>
 							<th>
 								{% if order.get_cart_items == 0 %}
-									<p style="color:red;">Your cart is empty. Please add items before proceeding to checkout.</p>
+									<p style="color:red;">Your cart is empty.
+										Please add items before proceeding to checkout.</p>
 								{% else %}
-									<a style="float:right; margin:5px;" class="btn btn-success" href="{% url 'checkout' %}">Checkout</a>
+									<a style="float:right; margin:5px;" class="btn btn-success" href="{% url 'checkout' %}">
+										Checkout</a>
 								{% endif %}
 							</th>
 						</tr>
 					</table>
-
 				</div>
 
 				<br>
@@ -45,9 +46,11 @@
 						<div style="flex:1">
 							<p class="quantity">{{item.quantity}}</p>
 							<div class="quantity">
-								<img data-product={{item.product.id}} data-action="add" class="chg-quantity update-cart" src="{% static 'main/img/arrow-up.png' %}">
+								<img data-product={{item.product.id}} data-action="add" class="chg-quantity update-cart"
+									 src="{% static 'main/img/arrow-up.png' %}">
 
-								<img data-product={{item.product.id}} data-action="remove" class="chg-quantity update-cart" src="{% static 'main/img/arrow-down.png' %}">
+								<img data-product={{item.product.id}} data-action="remove" class="chg-quantity update-cart"
+									 src="{% static 'main/img/arrow-down.png' %}">
 							</div>
 						</div>
 						<div style="flex:1"><p>{{item.get_total}}</p></div>
@@ -58,3 +61,4 @@
 		</div>
 	</div>
 {% endblock %}
+
