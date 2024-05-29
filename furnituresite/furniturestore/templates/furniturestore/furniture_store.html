@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-lg-1 col-md-2 col-sm-3 order-lg-first">
             <div class="category-sidebar">
-                <h3>Ціна</h3>
+                <h3>Price</h3>
                 <form class="price-filter-form" method="get" action="{% url 'furniture_store' %}" onsubmit="return validatePriceFilter()">
                     <div>
                         <input type="text" id="min_price" name="min_price">
@@ -21,7 +21,7 @@
                 <h3>Категорії</h3>
                 <ul class="category-menu">
                     <li {% if not current_category_slug %}class="active"{% endif %}>
-                        <a href="{% url 'furniture_store' %}">Все</a>
+                        <a href="{% url 'furniture_store' %}">All</a>
                     </li>
                     {% for category in categories %}
                         <li {% if category.slug == current_category_slug %}class="active"{% endif %}>
@@ -33,35 +33,43 @@
         </div>
         <div class="col-lg-10 col-md-10 col-sm-9 order-lg-last product-grid" style="margin-left: 50px">
             <div class="row">
-                {% for product in products %}
-                    <div class="col-lg-4">
-                        <img class="thumbnail" src="{{ product.imageURL }}">
-                        <div class="box-element product">
-                            <h6><strong>{{ product.name }}</strong></h6>
-                            <hr>
-                            {% if not product.in_stock %}
-                                <p style="display: inline-block; float: left; color: red; margin: 0px 10px 0px 0px;">Out of Stock :(</p>
-                            {%else%}
-                                <button data-product={{ product.id }} data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button>
-                            {% endif %}
-                            <a class="btn btn-outline-success" href="{% url 'product_detail' product.slug %}">View</a>
-                             {% if product.discount_price %}
-                                <span style="display: inline-block; float: right">
-                                    <del>${{ product.price|floatformat:0 }}</del>
-                                </span>
+                {% if products %}
+                    {% for product in products %}
+                        <div class="col-lg-4">
+                            <img class="thumbnail" src="{{ product.imageURL }}">
+                            <div class="box-element product">
+                                <h6><strong>{{ product.name }}</strong></h6>
+                                <hr>
+                                {% if not product.in_stock %}
+                                    <p style="display: inline-block; float: left; color: red; margin: 0px 10px 0px 0px;">Out of Stock :(</p>
+                                {%else%}
+                                    <button data-product={{ product.id }} data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button>
+                                {% endif %}
+                                <a class="btn btn-outline-success" href="{% url 'product_detail' product.slug %}">View</a>
+                                 {% if product.discount_price %}
+                                    <span style="display: inline-block; float: right">
+                                        <del>${{ product.price|floatformat:0 }}</del>
+                                    </span>
 
-                                <h4 style="display: inline-block; float: right; color: red;"><strong>${{ product.discount_price|floatformat:0 }}</strong></h4>
-                            {% else %}
-                            <h4 style="display: inline-block; float: right"><strong>${{ product.price|floatformat:0 }}</strong></h4>
-                            {% endif %}
+                                    <h4 style="display: inline-block; float: right; color: red;"><strong>${{ product.discount_price|floatformat:0 }}</strong></h4>
+                                {% else %}
+                                <h4 style="display: inline-block; float: right"><strong>${{ product.price|floatformat:0 }}</strong></h4>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-lg-12">
+                        <div class="alert alert-warning" role="alert" style="text-align: center;">
+                            На жаль, товарів у заданому діапазоні цін немає.
                         </div>
                     </div>
-                {% endfor %}
+                {% endif %}
             </div>
             <div class="pagination-wrapper" >
                 <div class="pagination">
                     {% if products.has_previous %}
-                        <a href="?page={{ products.previous_page_number }}">« Попередня сторінка</a>
+                        <a href="?page={{ products.previous_page_number }}">« Previous page</a>
                     {% endif %}
                     {% for num in products.paginator.page_range %}
                         {% if products.number == num %}
@@ -71,7 +79,7 @@
                         {% endif %}
                     {% endfor %}
                     {% if products.has_next %}
-                        <a href="?page={{ products.next_page_number }}">Наступна сторінка »</a>
+                        <a href="?page={{ products.next_page_number }}">Next page »</a>
                     {% endif %}
                 </div>
             </div>
@@ -83,70 +91,84 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.css" integrity="sha512-MKxcSu/LDtbIYHBNAWUQwfB3iVoG9xeMCm32QV5hZ/9lFaQZJVaXfz9aFa0IZExWzCpm7OWvp9zq9gVip/nLMg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-    var priceSlider = document.getElementById('priceSlider');
-    var minPriceInput = document.getElementById('min_price');
-    var maxPriceInput = document.getElementById('max_price');
-    var filterButton = document.getElementById('filterButton');
-    var priceFilterForm = document.querySelector('.price-filter-form');
+        var priceSlider = document.getElementById('priceSlider');
+        var minPriceInput = document.getElementById('min_price');
+        var maxPriceInput = document.getElementById('max_price');
+        var filterButton = document.getElementById('filterButton');
+        var priceFilterForm = document.querySelector('.price-filter-form');
 
-    // Получаем значения из куков
-    var initialMinPrice = parseFloat(getCookie('min_price')) || {{ min_price }};
-    var initialMaxPrice = parseFloat(getCookie('max_price')) || {{ max_price }};
+        // Получаем значения из куков
+        var initialMinPrice = parseFloat(getCookie('min_price')) || {{ min_price }};
+        var initialMaxPrice = parseFloat(getCookie('max_price')) || {{ max_price }};
 
-    noUiSlider.create(priceSlider, {
-        start: [initialMinPrice, initialMaxPrice],
-        connect: true,
-        range: {
-            'min': {{ min_price }},
-            'max': {{max_price}},
-        },
-    });
+        noUiSlider.create(priceSlider, {
+            start: [initialMinPrice, initialMaxPrice],
+            connect: true,
+            range: {
+                'min': {{ min_price }},
+                'max': {{ max_price }},
+            },
+        });
 
-    // Event handler для обновления слайдера
-    priceSlider.noUiSlider.on('update', function (values, handle) {
-        var value = values[handle];
+        // Event handler для обновления слайдера
+        priceSlider.noUiSlider.on('update', function (values, handle) {
+            var value = values[handle];
 
-        if (handle === 0) {
-            minPriceInput.value = value;
-        } else {
-            maxPriceInput.value = value;
-        }
-
-        // Enable кнопку "OK" после изменения значений
-        filterButton.disabled = false;
-    });
-
-    // Event handler для отправки формы
-    priceFilterForm.addEventListener('submit', function (event) {
-        event.preventDefault();
-
-        // Обновляем значения в куках
-        setCookie('min_price', minPriceInput.value);
-        setCookie('max_price', maxPriceInput.value);
-
-        this.submit();
-    });
-
-    // Обновляем значения при загрузке страницы
-    minPriceInput.value = initialMinPrice;
-    maxPriceInput.value = initialMaxPrice;
-
-    // Функция для установки значения в куки
-    function setCookie(name, value) {
-        document.cookie = name + '=' + value + '; path=/';
-    }
-
-    // Функция для получения значения из куков
-    function getCookie(name) {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = cookies[i].trim();
-            if (cookie.indexOf(name + '=') === 0) {
-                return cookie.substring(name.length + 1);
+            if (handle === 0) {
+                minPriceInput.value = value;
+            } else {
+                maxPriceInput.value = value;
             }
+
+            // Enable кнопку "OK" после изменения значений
+            filterButton.disabled = false;
+        });
+
+        // Event handler для отправки формы
+        priceFilterForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            // Обновляем значения в куках
+            setCookie('min_price', minPriceInput.value);
+            setCookie('max_price', maxPriceInput.value);
+
+            this.submit();
+        });
+
+        // Обновляем значения при загрузке страницы
+        minPriceInput.value = initialMinPrice;
+        maxPriceInput.value = initialMaxPrice;
+
+        // Функция для установки значения в куки
+        function setCookie(name, value) {
+            document.cookie = name + '=' + value + '; path=/';
         }
-        return null;
-    }
-});
+
+        // Функция для получения значения из куков
+        function getCookie(name) {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.indexOf(name + '=') === 0) {
+                    return cookie.substring(name.length + 1);
+                }
+            }
+            return null;
+        }
+
+        // Обработка события beforeunload для очистки куков
+        window.addEventListener('beforeunload', function (event) {
+            if (!priceFilterForm.classList.contains('submitting')) {
+                // Очистка куков при выходе со страницы
+                setCookie('min_price', '', -1);
+                setCookie('max_price', '', -1);
+            }
+        });
+
+        // Добавление класса при отправке формы для предотвращения очистки куков
+        priceFilterForm.addEventListener('submit', function () {
+            priceFilterForm.classList.add('submitting');
+        });
+    });
 </script>
 {% endblock %}

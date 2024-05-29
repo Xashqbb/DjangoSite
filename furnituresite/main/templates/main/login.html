@@ -30,7 +30,7 @@
         {% if invalid_login %}
           <p class="error" style="color:red; text-align:center">Invalid email or password.</p>
         {% endif %}
-        <a href="#">Forgot password?</a>
+        <a href="{% url 'password_reset' %}">Forgot password?</a>
         <input type="submit" class="button" value="Login">
       </form>
       <div class="signup">

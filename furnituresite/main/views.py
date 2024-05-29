@@ -1,13 +1,18 @@
 from django.contrib.auth import authenticate,login,logout
+from django.contrib.auth.views import PasswordResetView, PasswordResetConfirmView
 from django.http import HttpResponse
 from django.shortcuts import render,redirect
 from django.contrib.auth.hashers import make_password
+from django.urls import reverse_lazy
+from django.contrib import messages
+from django.shortcuts import render
+from django.contrib.messages import get_messages
 from cart.models import *
 from .models import *
 from utils import cookieCart,cartData
 from forms import *
-def home_page(request):
 
+def home_page(request):
     data = cartData(request)
     cartItems = data['cartItems']
     order = data['order']
@@ -15,7 +20,7 @@ def home_page(request):
 
     products = FurnitureProduct.objects.all()
     context = {'products': products, 'cartItems': cartItems}
-    return render(request,'main/main.html',context)
+    return render(request, 'main/main.html', context)
 
 
 def user_signup(request):
@@ -82,4 +87,19 @@ def cabinet(request):
     context = {'products': products, 'cartItems': cartItems, 'user': user_info, 'bonus_balance': bonus_balance}
     return render(request, 'main/cabinet.html', context)
 
+class CustomPasswordResetView(PasswordResetView):
+    form_class = CustomPasswordResetForm
+    template_name = 'main/password_reset.html'
+    email_template_name = 'registration/password_reset_email.html'
+    success_url = reverse_lazy('password_reset_done')
 
+
+class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    form_class = CustomSetPasswordForm
+    template_name = 'main/password_reset_confirm.html'
+    success_url = reverse_lazy('password_reset_complete')
+
+
+class CustomPasswordResetCompleteView(PasswordResetCompleteView):
+    template_name = 'main/password_reset_complete.html'
+    success_url = reverse_lazy('home')

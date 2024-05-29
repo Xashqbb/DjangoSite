@@ -1,7 +1,13 @@
 {% extends 'main/base.html' %}
 {% load static %}
 {% block bodycontent %}
-
+{% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
 <div class="hero_area" style="background-image: url('{% static 'main/img/hero-bg.png' %}');">
 <section class="slider_section ">
       <div class="play_btn">
