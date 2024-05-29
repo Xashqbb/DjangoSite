@@ -1,7 +1,13 @@
 {% extends 'main/base.html' %}
 {% load static %}
 {% block bodycontent %}
-
+{% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
 <div class="hero_area" style="background-image: url('{% static 'main/img/hero-bg.png' %}');">
 <section class="slider_section ">
       <div class="play_btn">
@@ -196,12 +202,12 @@
       a = $(".indicator-2").find("[data-slide-to='" + indicators + "']").addClass("active");
       console.log(indicators);
     })
-      // Добавьте обработчик события для кнопки play_btn
+
     $('.play_btn a').click(function(e) {
       e.preventDefault();
-      // Получите элемент карусели
+
       var carousel = $("#carouselExampleIndicators");
-      // Вызовите метод переключения на следующий слайд
+
       carousel.carousel('next');
     });
   </script>

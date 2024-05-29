@@ -1,10 +1,15 @@
 from django.shortcuts import render,redirect
+from django.template.loader import render_to_string
+
 from .models import *
 from furniturestore.models import *
 from django.http import JsonResponse
 import datetime
 import json
 from utils import cookieCart,cartData,guestOrder
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 def cart(request):
     data = cartData(request)
@@ -70,4 +75,29 @@ def processOrder(request):
         order.complete = True
     order.save()
 
+    send_order_confirmation_email(customer.email, order)
+
     return JsonResponse('Payment complete', safe=False)
+
+def send_order_confirmation_email(email, order):
+    sender_email = "mrhoriizonn@gmail.com"
+    app_password = "bkcpeykqklresikw"
+
+    subject = "Confirmation of your order"
+    recipient = email
+
+    # Підготовка повідомлення
+    message = render_to_string('cart/order_confirmation.html', {'order': order})
+
+    msg = MIMEMultipart()
+    msg['From'] = sender_email
+    msg['To'] = recipient
+    msg['Subject'] = subject
+    msg.attach(MIMEText(message, 'html'))
+
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.starttls()
+    server.login(sender_email, app_password)
+    text = msg.as_string()
+    server.sendmail(sender_email, recipient, text)
+    server.quit()

@@ -1,10 +1,11 @@
+import os
 from django.db import models
 from django.urls import reverse
 
-
 class Category(models.Model):
-    name = models.CharField(max_length=255,null=True)
-    slug = models.SlugField(max_length=255,unique=True,db_index=True,verbose_name="URL")
+    name = models.CharField(max_length=255, null=True)
+    slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="URL")
+
     def __str__(self):
         return self.name
 
@@ -21,14 +22,11 @@ class FurnitureProduct(models.Model):
     discount_price = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
     in_stock = models.BooleanField(default=True)
 
-
     def get_absolute_url(self):
         return reverse('product_detail', kwargs={'product_slug': self.slug})
 
     def __str__(self):
         return self.name
-
-
 
     @property
     def imageURL(self):
@@ -47,11 +45,13 @@ class FurnitureProduct(models.Model):
         return url
 
 def image_folder_path(instance, filename):
-    return f'main/static/main/img/img_for_product/additional_images/{instance.article}/{filename}'
+    article_folder = instance.product.article
+    return f'main/static/main/img/img_for_product/additional_images/{article_folder}/{filename}'
+
 
 class AdditionalImage(models.Model):
     product = models.ForeignKey(FurnitureProduct, related_name='additional_images', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='main/static/main/img/img_for_product/additional_images/')
+    image = models.ImageField(upload_to=image_folder_path)
 
     def __str__(self):
         return f"Additional Image for {self.product.name}"
