@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Order Confirmation</title>
+</head>
+<body>
+    <p>Dear {{ order.customer.name }},</p>
+    <p>Thank you for your order!</p>
+    <p>Here are the details of your order:</p>
+    <ul>
+        {% for item in order.orderitem_set.all %}
+            <strong>Product:</strong> {{ item.product.name }}<br>
+            <strong>Price:</strong> {{ item.product.price }}<br>
+            <strong>Quantity:</strong> {{ item.quantity }}<br>
+            <strong>Subtotal:</strong> {{ item.get_total }}<br>
+        {% endfor %}
+    </ul>
+    <p>Total items: {{ order.get_cart_items }}</p>
+    <p>Total amount: {{ order.get_cart_total }}</p>
+    <p>Order date: {{ order.date_ordered }}</p>
+    <p>Regards,</p>
+    <p>The TamTumba Team</p>
+</body>
+</html>

@@ -57,12 +57,6 @@ function init() {
         function (error) {
             console.log('Error ->' + error)
         });
-
-//        // Check if MTL file exists
-//        const mtlLoader = new MTLLoader();
-//        mtlLoader.load(view3d_url.replace('.obj', '.mtl'), function (materials) {
-//            loader.setMaterials(materials); // Set materials if MTL file exists
-//        });
     }
 
     // Model
@@ -78,8 +72,6 @@ function init() {
     light2.position.set(2, 0, 5)
     light2.lookAt(0, 1, 0)
     scene.add(light2)
-
-
 
     // OrbitControls
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -97,13 +89,25 @@ function init() {
         renderer.setSize(window.innerWidth, window.innerHeight)
     }
 
-    // Keyboard controls for object rotation
+    // Keyboard controls for object rotation and camera movement
     document.addEventListener('keydown', (event) => {
         switch (event.key) {
             case 'a': // Toggle auto-rotation on 'A' key
+            case 'ф': // Toggle auto-rotation on 'A' key (Cyrillic)
                 isRotating = !isRotating;
                 break;
-            // ... (other arrow key controls for camera movement)
+            case 'ArrowUp': // Move camera forward
+                camera.position.y += 0.1;
+                break;
+            case 'ArrowDown': // Move camera backward
+                camera.position.y -= 0.1;
+                break;
+            case 'ArrowLeft': // Move camera left
+                camera.position.x -= 0.1;
+                break;
+            case 'ArrowRight': // Move camera right
+                camera.position.x += 0.1;
+                break;
         }
     });
 
