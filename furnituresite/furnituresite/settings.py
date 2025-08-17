@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'main',
     'furniturestore',
     'cart',
+    'crm',
 
     'django_use_email_as_username.apps.DjangoUseEmailAsUsernameConfig',
     'custom_user.apps.CustomUserConfig',
@@ -56,7 +57,7 @@ ROOT_URLCONF = 'furnituresite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

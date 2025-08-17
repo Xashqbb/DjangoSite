@@ -136,7 +136,7 @@
 		.then((response) => response.json())
 		.then((data) => {
 			console.log('Success:', data)
-			alert('Order completed')
+			alert('Order completed, we send you an email with your order details')
 
 			cart = {}
 			document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/"

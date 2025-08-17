@@ -1,0 +1,65 @@
+{% extends "admin/index.html" %}
+
+{% block content %}
+<h1>CRM Дашборд</h1>
+
+<p>
+    <a href="/admin/" style="display:inline-block; padding:10px 20px;
+       background:#007bff; color:white; text-decoration:none; border-radius:5px;">
+       Повернутись у стандартну адмін-панель
+    </a>
+</p>
+
+<div style="display:flex; gap:20px; flex-wrap:wrap; margin-bottom:30px;">
+    <div style="padding:20px; background:#f8f9fa; border:1px solid #ddd; border-radius:10px;">
+        <h2>Клієнти</h2>
+        <p>{{ total_customers }}</p>
+    </div>
+
+    <div style="padding:20px; background:#f8f9fa; border:1px solid #ddd; border-radius:10px;">
+        <h2>Замовлення</h2>
+        <p>Всього: {{ total_orders }}</p>
+        <p>Завершені: {{ completed_orders }}</p>
+    </div>
+
+    <div style="padding:20px; background:#f8f9fa; border:1px solid #ddd; border-radius:10px;">
+        <h2>Сума товарів у кошиках</h2>
+        <p>{{ total_revenue }}</p>
+    </div>
+
+    <div style="padding:20px; background:#f8f9fa; border:1px solid #ddd; border-radius:10px;">
+        <h2>Нараховані бонуси</h2>
+        <p>{{ total_bonus }}</p>
+    </div>
+</div>
+
+<h2>Графік замовлень по місяцях</h2>
+<canvas id="ordersChart" width="600" height="300"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('ordersChart');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ months|safe }},
+            datasets: [{
+                label: 'Кількість замовлень',
+                data: {{ counts|safe }},
+                borderColor: 'rgba(54, 162, 235, 1)',
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: true, position: 'top' }
+            }
+        }
+    });
+</script>
+
+{{ block.super }}
+{% endblock %}
