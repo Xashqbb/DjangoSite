@@ -10,6 +10,6 @@ urlpatterns = [
     path('',include('main.urls')),
     path('furniturestore/',include('furniturestore.urls')),
     path('cart/',include('cart.urls')),
-    path('crm-admin/', crm_admin_site.urls),
+    path("crm-admin/", crm_admin_site.urls, name="crm_admin"),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,0 +1,99 @@
+{% extends "admin/base_site.html" %}
+
+{% block extrahead %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Замовлення CRM</h1>
+
+    <p>
+        <a href="{% url 'crm_admin:crm-analytics' %}" class="btn btn-success">
+            📊 Перейти до аналітики
+        </a>
+    </p>
+
+    <form id="filterForm" class="row g-3 mb-4">
+        <div class="col-md-2">
+            <select name="status" class="form-select">
+                <option value="">Всі статуси</option>
+                <option value="pending">⏳ В обробці</option>
+                <option value="completed">✅ Завершено</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <input type="text" name="customer" class="form-control" placeholder="Клієнт">
+        </div>
+        <div class="col-md-2">
+            <input type="date" name="date_from" class="form-control">
+        </div>
+        <div class="col-md-2">
+            <input type="date" name="date_to" class="form-control">
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">🔍 Пошук</button>
+        </div>
+    </form>
+
+    <table class="table table-striped table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Клієнт</th>
+                <th>Дата</th>
+                <th>Статус</th>
+            </tr>
+        </thead>
+        <tbody id="ordersTable">
+            {% for order in orders %}
+            <tr>
+                <td>{{ order.id }}</td>
+                <td>{{ order.customer }}</td>
+                <td>{{ order.date_ordered|date:"Y-m-d H:i" }}</td>
+                <td>
+                    {% if order.complete %}
+                        <span class="badge bg-success">✅ Завершено</span>
+                    {% else %}
+                        <span class="badge bg-warning text-dark">⏳ В обробці</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+document.getElementById("filterForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const form = e.target;
+    const params = new URLSearchParams(new FormData(form));
+
+    fetch("?" + params.toString(), {
+        headers: { "X-Requested-With": "XMLHttpRequest" }
+    })
+    .then(res => res.json())
+    .then(data => {
+        const tbody = document.getElementById("ordersTable");
+        tbody.innerHTML = "";
+
+        if (data.orders.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center">Немає замовлень</td></tr>`;
+        } else {
+            data.orders.forEach(order => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${order.id}</td>
+                        <td>${order.customer}</td>
+                        <td>${order.date}</td>
+                        <td>${order.status}</td>
+                    </tr>
+                `;
+            });
+        }
+    });
+});
+</script>
+{% endblock %}
