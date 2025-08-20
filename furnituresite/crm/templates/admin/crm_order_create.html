@@ -1,0 +1,133 @@
+{% extends "admin/base_site.html" %}
+
+{% block extrahead %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    /* Поле кількості – завжди білий фон */
+    input[type="number"] {
+        background-color: #fff !important;
+        color: #000 !important;
+    }
+
+    /* Поле клієнта – не на весь екран */
+    #customer {
+        max-width: 500px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        height: auto;
+    }
+
+    /* Select для товарів */
+    .product-select {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        height: auto;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">➕ Створення нового замовлення</h1>
+
+    <p>
+        <a href="{% url 'crm_admin:crm-orders' %}" class="btn btn-secondary">
+            ← Назад до замовлень
+        </a>
+    </p>
+
+    <form id="createOrderForm" class="mb-4">
+        <!-- Вибір клієнта -->
+        <div class="mb-3">
+            <label for="customer" class="form-label">Клієнт</label>
+            <select class="form-select" id="customer" name="customer" required>
+                <option value="">-- Оберіть клієнта --</option>
+                {% for c in customers %}
+                <option value="{{ c.id }}" title="{{ c.name }} {{ c.surname }} ({{ c.email }})">
+                    {{ c.name }} {{ c.surname }} ({{ c.email }})
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Додавання товарів -->
+        <div class="mb-3">
+            <label class="form-label">Товари</label>
+            <div id="itemsContainer"></div>
+            <button type="button" id="addItemBtn" class="btn btn-outline-primary btn-sm mt-2">
+                ➕ Додати товар
+            </button>
+        </div>
+
+        <button type="submit" class="btn btn-success">✅ Створити замовлення</button>
+    </form>
+</div>
+
+<script>
+// Додавання рядка для товару
+document.getElementById("addItemBtn").addEventListener("click", function() {
+    const container = document.getElementById("itemsContainer");
+
+    const div = document.createElement("div");
+    div.className = "row g-2 mb-2 align-items-center";
+    div.innerHTML = `
+        <div class="col-md-6">
+            <select class="form-select product-select" name="product">
+                <option value="">-- Оберіть товар --</option>
+                {% for p in products %}
+                <option value="{{ p.id }}" title="{{ p.name }} ({{ p.price }} грн)">
+                    {{ p.name }} ({{ p.price }} грн)
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <input type="number" name="quantity" class="form-control" min="1" value="1">
+        </div>
+        <div class="col-md-3">
+            <button type="button" class="btn btn-danger btn-sm removeItem">🗑 Видалити</button>
+        </div>
+    `;
+    container.appendChild(div);
+
+    div.querySelector(".removeItem").addEventListener("click", function() {
+        div.remove();
+    });
+});
+
+// Відправка форми AJAX
+document.getElementById("createOrderForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const customer = document.getElementById("customer").value;
+    const items = [];
+    document.querySelectorAll("#itemsContainer .row").forEach(row => {
+        const product = row.querySelector("select[name='product']").value;
+        const quantity = row.querySelector("input[name='quantity']").value;
+        if (product) {
+            items.push({ product, quantity });
+        }
+    });
+
+    fetch("{% url 'crm_admin:crm-create-order-ajax' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: JSON.stringify({ customer, items })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert("✅ Замовлення створено!");
+            window.location.href = "{% url 'crm_admin:crm-orders' %}";
+        } else {
+            alert("❌ Помилка: " + data.error);
+        }
+    });
+});
+</script>
+{% endblock %}
