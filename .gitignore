@@ -1,2 +1,32 @@
+# Django-specific files
+*.log
+*.pot
+*.pyc
+__pycache__/
 
-/venv/
+# Folders for virtual environments
+venv/
+env/
+
+# IDE-specific files (e.g., PyCharm)
+.idea/
+.vscode/
+
+# Database files
+*.sqlite3
+db.sqlite3
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Media and uploaded files
+/media/
+
+# Configuration files with sensitive data
+*.env
+.env
+.flaskenv
+*.ini
+
+credentials.json
