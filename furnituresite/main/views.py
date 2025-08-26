@@ -13,13 +13,25 @@ from utils import cookieCart,cartData
 from forms import *
 
 def home_page(request):
-    data = cartData(request)
-    cartItems = data['cartItems']
-    order = data['order']
-    items = data['items']
+    if request.user.is_authenticated:
+        customer = request.user.customer
+        # замість get() -> беремо останнє незавершене замовлення
+        order = Order.objects.filter(customer=customer, complete=False).order_by('-id').first()
+        if not order:
+            order = Order.objects.create(customer=customer, complete=False)
+        items = order.orderitem_set.all()
+        cartItems = order.get_cart_items
+    else:
+        data = cartData(request)  # для гостей — використовуємо cookies
+        order = data['order']
+        items = data['items']
+        cartItems = data['cartItems']
 
     products = FurnitureProduct.objects.all()
-    context = {'products': products, 'cartItems': cartItems}
+    context = {
+        'products': products,
+        'cartItems': cartItems
+    }
     return render(request, 'main/main.html', context)
 
 

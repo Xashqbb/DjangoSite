@@ -1,0 +1,14 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<h1>Адмінка сайту</h1>
+
+<p>
+    <a href="/crm-admin/" style="display:inline-block; padding:10px 20px;
+       background:#28a745; color:white; text-decoration:none; border-radius:5px;">
+       Перейти в CRM
+    </a>
+</p>
+
+{{ block.super }}
+{% endblock %}

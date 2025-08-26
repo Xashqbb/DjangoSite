@@ -1,0 +1,49 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<h1>Замовлення CRM</h1>
+
+<p>
+    <a href="{% url 'crm_admin:crm-analytics' %}" style="padding:10px 20px; background:#28a745; color:white; text-decoration:none; border-radius:5px;">
+        Перейти до аналітики
+    </a>
+</p>
+
+<form method="get" style="margin-bottom:20px; display:flex; gap:15px; flex-wrap:wrap;">
+    <select name="status">
+        <option value="">Всі статуси</option>
+        <option value="pending" {% if request.GET.status == "pending" %}selected{% endif %}>В обробці</option>
+        <option value="completed" {% if request.GET.status == "completed" %}selected{% endif %}>Завершено</option>
+    </select>
+    <input type="text" name="customer" placeholder="Клієнт" value="{{ request.GET.customer }}">
+    <input type="date" name="date_from" value="{{ request.GET.date_from }}">
+    <input type="date" name="date_to" value="{{ request.GET.date_to }}">
+    <button type="submit">Пошук</button>
+</form>
+
+<table border="1" cellpadding="5" cellspacing="0">
+    <tr>
+        <th>ID</th>
+        <th>Клієнт</th>
+        <th>Дата</th>
+        <th>Статус</th>
+    </tr>
+    {% for order in orders %}
+    <tr>
+        <td>{{ order.id }}</td>
+        <td>{{ order.customer }}</td>
+        <td>{{ order.date_ordered }}</td>
+        <td>
+            {% if order.complete %}
+                ✅ Завершено
+            {% else %}
+                ⏳ В обробці
+            {% endif %}
+        </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="4">Немає замовлень</td></tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

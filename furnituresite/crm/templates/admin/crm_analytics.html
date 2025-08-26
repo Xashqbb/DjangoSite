@@ -1,0 +1,106 @@
+{% extends "admin/base_site.html" %}
+
+{% block extrahead %}
+<!-- Bootstrap 5 -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Аналітика CRM</h1>
+
+    <p>
+        <a href="{% url 'crm_admin:crm-orders' %}" class="btn btn-primary">
+            ← Повернутись до замовлень
+        </a>
+    </p>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">👥 Клієнти</h5>
+                    <p class="card-text fs-4">{{ total_customers }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">📦 Замовлення</h5>
+                    <p>Всього: <strong>{{ total_orders }}</strong></p>
+                    <p>Завершені: <strong>{{ completed_orders }}</strong></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">🛒 Товари у кошиках</h5>
+                    <p class="fs-4">{{ total_revenue }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">🎁 Бонуси</h5>
+                    <p class="fs-4">{{ total_bonus }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="mb-3">📊 Графік замовлень по місяцях</h2>
+    <canvas id="ordersChart" height="120"></canvas>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('ordersChart');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {{ months|safe }},
+                datasets: [{
+                    label: 'Кількість замовлень',
+                    data: {{ counts|safe }},
+                    borderColor: '#007bff',
+                    backgroundColor: 'rgba(0, 123, 255, 0.3)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: true, position: 'top' } }
+            }
+        });
+    </script>
+
+    <div class="row mt-5">
+        <div class="col-md-6">
+            <h3>🏆 Топ-5 клієнтів</h3>
+            <ul class="list-group">
+                {% for c in top_customers %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ c.customer__name }} {{ c.customer__surname }}
+                    <span class="badge bg-primary rounded-pill">{{ c.total_spent }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="col-md-6">
+            <h3>🔥 Топ-5 товарів</h3>
+            <ul class="list-group">
+                {% for p in top_products %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ p.product__name }}
+                    <span class="badge bg-success rounded-pill">{{ p.total_sold }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

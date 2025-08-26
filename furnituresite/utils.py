@@ -42,15 +42,19 @@ def cookieCart(request):
 def cartData(request):
     if request.user.is_authenticated:
         customer = request.user.customer
-        order,created = Order.objects.get_or_create(customer=customer, complete=False)
+        # Беремо останнє незавершене замовлення
+        order = Order.objects.filter(customer=customer, complete=False).order_by('-id').first()
+        if not order:
+            order = Order.objects.create(customer=customer, complete=False)
         items = order.orderitem_set.all()
         cartItems = order.get_cart_items
     else:
-        coockieData = cookieCart(request)
-        cartItems = coockieData['cartItems']
-        order = coockieData['order']
-        items = coockieData['items']
-    return {'cartItems':cartItems,'order':order,'items':items}
+        cookieData = cookieCart(request)
+        cartItems = cookieData['cartItems']
+        order = cookieData['order']
+        items = cookieData['items']
+    return {'cartItems': cartItems, 'order': order, 'items': items}
+
 
 def guestOrder(request,data):
     print('User is not logged in')
