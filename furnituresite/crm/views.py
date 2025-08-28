@@ -4,7 +4,6 @@ from cart.models import Order
 from django.core.serializers import serialize
 from django.db.models import Q
 
-
 def orders_view(request):
     status = request.GET.get("status")
     customer = request.GET.get("customer")
