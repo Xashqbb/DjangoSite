@@ -1,0 +1,26 @@
+{% extends "admin/crm_base.html" %}
+
+{% block crm_content %}
+<h1>Клієнти</h1>
+
+<table border="1" cellpadding="5" cellspacing="0" width="100%">
+    <tr>
+        <th>ID</th>
+        <th>Ім'я</th>
+        <th>Email</th>
+        <th>Дії</th>
+    </tr>
+    {% for customer in customers %}
+    <tr>
+        <td>{{ customer.id }}</td>
+        <td>{{ customer.name }} {{ customer.surname }}</td>
+        <td>{{ customer.email }}</td>
+        <td>
+            <a href="{% url 'crm_customer_detail' customer.id %}">Переглянути</a>
+        </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="4">Немає клієнтів</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}

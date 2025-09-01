@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from furniturestore.models import *
 from decimal import Decimal
+from django.utils import timezone
 
 
 class Customer(models.Model):
@@ -28,7 +29,7 @@ class Order(models.Model):
     date_ordered = models.DateTimeField(auto_now_add=True)
     complete = models.BooleanField(default=False, null=True, blank=False)
     transaction_id = models.CharField(max_length=200, null=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="new")  # 👈 нове поле
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="new")
 
     def __str__(self):
         return f"Order {self.id} ({self.get_status_display()})"
@@ -46,7 +47,6 @@ class Order(models.Model):
         return total
 
     def bonusCount(self):
-        # Обчислюємо бонуси на основі суми замовлення (5%)
         bonus_amount = self.get_cart_total * Decimal('0.05')
         if bonus_amount > 0:
             if not self.customer.bonus:
@@ -90,3 +90,39 @@ class ShippingAddres(models.Model):
 
     def __str__(self):
         return self.address
+
+
+class UserActionLog(models.Model):
+    ACTION_CHOICES = [
+        ("create", "Створення"),
+        ("update", "Оновлення"),
+        ("delete", "Видалення"),
+        ("status_change", "Зміна статусу"),
+        ("login", "Вхід"),
+        ("logout", "Вихід"),
+    ]
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    action_type = models.CharField(max_length=50, choices=ACTION_CHOICES)
+    description = models.TextField()
+    timestamp = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"[{self.timestamp}] {self.user} - {self.get_action_type_display()}"
+
+
+class Interaction(models.Model):
+    INTERACTION_TYPES = [
+        ("call", "Дзвінок"),
+        ("email", "Електронний лист"),
+        ("meeting", "Зустріч"),
+        ("note", "Замітка"),
+    ]
+
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="interactions")
+    interaction_type = models.CharField(max_length=20, choices=INTERACTION_TYPES)
+    notes = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.get_interaction_type_display()} з {self.customer} ({self.created_at.strftime('%Y-%m-%d %H:%M')})"

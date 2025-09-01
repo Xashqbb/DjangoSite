@@ -1,106 +1,147 @@
-{% extends "admin/base_site.html" %}
+{% extends "admin/crm_base.html" %}
+{% load static %}
 
 {% block extrahead %}
-<!-- Bootstrap 5 -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+{{ block.super }}
+<style>
+    /* Перевизначаємо фон контентної частини адмінки Django для цієї сторінки */
+    #content {
+        background-color: #1c1f23; /* Темний фон, трохи світліший за картки */
+    }
+    .card {
+        transition: all 0.2s ease-in-out;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4) !important;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1 class="mb-4">Аналітика CRM</h1>
-
-    <p>
-        <a href="{% url 'crm_admin:crm-orders' %}" class="btn btn-primary">
-            ← Повернутись до замовлень
-        </a>
-    </p>
-
-    <div class="row mb-4">
+<div class="container-fluid text-light py-4">
+    <div class="row mb-4 g-4">
         <div class="col-md-3">
-            <div class="card text-center shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">👥 Клієнти</h5>
-                    <p class="card-text fs-4">{{ total_customers }}</p>
+            <div class="card text-center bg-dark text-light shadow border border-secondary h-100">
+                <div class="card-body d-flex flex-column justify-content-center">
+                    <h2 class="card-title mb-3">👥 Всього клієнтів</h2>
+                    <p class="card-text display-2 fw-bold">{{ total_customers }}</p>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card text-center shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">📦 Замовлення</h5>
-                    <p>Всього: <strong>{{ total_orders }}</strong></p>
-                    <p>Завершені: <strong>{{ completed_orders }}</strong></p>
+            <div class="card text-center bg-dark text-light shadow border border-secondary h-100">
+                <div class="card-body d-flex flex-column justify-content-center">
+                    <h2 class="card-title mb-3">📦 Замовлення</h2>
+                    <p class="fs-2 mb-2">Всього: <strong class="fw-bold">{{ total_orders }}</strong></p>
+                    <p class="fs-2">Завершені: <strong class="fw-bold">{{ completed_orders }}</strong></p>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card text-center shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">🛒 Товари у кошиках</h5>
-                    <p class="fs-4">{{ total_revenue }}</p>
+            <div class="card text-center bg-dark text-light shadow border border-secondary h-100">
+                <div class="card-body d-flex flex-column justify-content-center">
+                    <h2 class="card-title mb-3">🛒 Кількість товарів у корзині</h2>
+                    <p class="card-text display-2 fw-bold">{{ total_products }}</p>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card text-center shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">🎁 Бонуси</h5>
-                    <p class="fs-4">{{ total_bonus }}</p>
+            <div class="card text-center bg-dark text-light shadow border border-secondary h-100">
+                <div class="card-body d-flex flex-column justify-content-center">
+                    <h2 class="card-title mb-3">💰 Сума товарів у корзині</h2>
+                    <p class="card-text display-2 fw-bold">{{ total_products_sum }}</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <h2 class="mb-3">📊 Графік замовлень по місяцях</h2>
-    <canvas id="ordersChart" height="120"></canvas>
+    <div class="card bg-dark text-light shadow border border-secondary mb-4">
+        <div class="card-body">
+            <h3 class="card-title text-center mb-3">📊 Графік замовлень по місяцях</h3>
+            <div style="position: relative; height: 40vh;">
+                <canvas id="ordersChart"></canvas>
+            </div>
+        </div>
+    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        const ctx = document.getElementById('ordersChart');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: {{ months|safe }},
-                datasets: [{
-                    label: 'Кількість замовлень',
-                    data: {{ counts|safe }},
-                    borderColor: '#007bff',
-                    backgroundColor: 'rgba(0, 123, 255, 0.3)',
-                    fill: true,
-                    tension: 0.3
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { display: true, position: 'top' } }
-            }
-        });
-    </script>
-
-    <div class="row mt-5">
-        <div class="col-md-6">
-            <h3>🏆 Топ-5 клієнтів</h3>
-            <ul class="list-group">
-                {% for c in top_customers %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    {{ c.customer__name }} {{ c.customer__surname }}
-                    <span class="badge bg-primary rounded-pill">{{ c.total_spent }}</span>
-                </li>
-                {% endfor %}
-            </ul>
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card bg-dark text-light shadow border border-secondary h-100">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">🏆 Топ-5 клієнтів</h2>
+                    <ul class="list-group list-group-flush">
+                        {% for c in top_customers %}
+                        <li class="list-group-item bg-dark text-light d-flex justify-content-between align-items-center py-3">
+                            <div>
+                                <strong class="fs-4">{{ c.order__customer__name }}</strong><br>
+                                <small class="text-muted">{{ c.order__customer__email }}</small>
+                            </div>
+                            <span class="badge bg-primary rounded-pill fs-4 px-3 py-2">{{ c.total_spent }} грн</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
         </div>
 
-        <div class="col-md-6">
-            <h3>🔥 Топ-5 товарів</h3>
-            <ul class="list-group">
-                {% for p in top_products %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    {{ p.product__name }}
-                    <span class="badge bg-success rounded-pill">{{ p.total_sold }}</span>
-                </li>
-                {% endfor %}
-            </ul>
+        <div class="col-lg-6">
+            <div class="card bg-dark text-light shadow border border-secondary h-100">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">🔥 Топ-5 товарів</h2>
+                    <ul class="list-group list-group-flush">
+                        {% for p in top_products %}
+                        <li class="list-group-item bg-dark text-light d-flex justify-content-between align-items-center py-3">
+                             <span class="fs-4">{{ p.product__name }}</span>
+                            <span class="badge bg-success rounded-pill fs-4 px-3 py-2">{{ p.total_sold }} шт.</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('ordersChart').getContext('2d');
+    const ordersChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ months|safe }},
+            datasets: [{
+                label: 'Кількість замовлень',
+                data: {{ counts|safe }},
+                borderColor: '#0d6efd',
+                backgroundColor: 'rgba(13, 110, 253, 0.2)',
+                borderWidth: 3,
+                tension: 0.4,
+                fill: true,
+                pointBackgroundColor: '#fff',
+                pointBorderColor: '#0d6efd',
+                pointHoverRadius: 7,
+                pointRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { labels: { color: "#f8f9fa", font: { size: 14 } } }
+            },
+            scales: {
+                x: {
+                    ticks: { color: "#ced4da" },
+                    grid: { color: "rgba(255, 255, 255, 0.1)" }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: { color: "#ced4da" },
+                    grid: { color: "rgba(255, 255, 255, 0.1)" }
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}

@@ -1,0 +1,15 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div style="margin-bottom:20px; padding:10px; border-radius:5px;">
+    <a href="{% url 'crm_orders' %}" style="margin-right:15px;">Замовлення</a>
+    <a href="{% url 'crm_customers' %}" style="margin-right:15px;">Клієнти</a>
+    <a href="{% url 'crm_logs' %}" style="margin-right:15px;">Логи</a>
+    <a href="{% url 'crm_analytics' %}">Аналітика</a>
+</div>
+
+<hr>
+
+{% block crm_content %}
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "admin/crm_base.html" %}
+
+{% block crm_content %}
+<h2>Клієнт: {{ customer.name }} {{ customer.surname }}</h2>
+<p>Email: {{ customer.email }}</p>
+
+<h3>Замовлення</h3>
+<table border="1" cellpadding="5" cellspacing="0" width="100%">
+    <tr>
+        <th>ID</th>
+        <th>Дата</th>
+        <th>Статус</th>
+    </tr>
+    {% for order in orders %}
+    <tr>
+        <td>{{ order.id }}</td>
+        <td>{{ order.date_ordered|date:"Y-m-d H:i" }}</td>
+        <td>
+            {% if order.complete %}
+                ✅ Завершено
+            {% else %}
+                ⏳ В обробці
+            {% endif %}
+        </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="3">Немає замовлень</td></tr>
+    {% endfor %}
+</table>
+
+<h3>Взаємодії</h3>
+<ul>
+    {% for interaction in interactions %}
+        <li>{{ interaction.created_at|date:"Y-m-d H:i" }} — {{ interaction.notes }}</li>
+    {% empty %}

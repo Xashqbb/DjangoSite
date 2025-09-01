@@ -1,0 +1,34 @@
+{% extends "admin/crm_base.html" %}
+
+{% block crm_content %}
+<h2>Журнал дій адміністраторів</h2>
+
+<table border="1" cellpadding="5" cellspacing="0" width="100%">
+    <tr>
+        <th>ID</th>
+        <th>Адмін</th>
+        <th>Тип дії</th>
+        <th>Опис</th>
+        <th>Дата</th>
+    </tr>
+    {% for log in logs %}
+    <tr>
+        <td>{{ log.id }}</td>
+        <td>
+            {% if log.user %}
+                {{ log.user.username }}
+            {% else %}
+                Система
+            {% endif %}
+        </td>
+        <td>{{ log.get_action_type_display }}</td>
+        <td>{{ log.description }}</td>
+        <td>{{ log.timestamp|date:"Y-m-d H:i" }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="5">Немає записів у журналі</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
