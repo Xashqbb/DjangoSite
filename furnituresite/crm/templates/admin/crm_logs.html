@@ -1,34 +1,42 @@
 {% extends "admin/crm_base.html" %}
 
-{% block crm_content %}
-<h2>Журнал дій адміністраторів</h2>
+{% block extrahead %}
+{{ block.super }}
+<style>
+    #content { background-color: #1c1f23; }
+</style>
+{% endblock %}
 
-<table border="1" cellpadding="5" cellspacing="0" width="100%">
-    <tr>
-        <th>ID</th>
-        <th>Адмін</th>
-        <th>Тип дії</th>
-        <th>Опис</th>
-        <th>Дата</th>
-    </tr>
-    {% for log in logs %}
-    <tr>
-        <td>{{ log.id }}</td>
-        <td>
-            {% if log.user %}
-                {{ log.user.username }}
-            {% else %}
-                Система
-            {% endif %}
-        </td>
-        <td>{{ log.get_action_type_display }}</td>
-        <td>{{ log.description }}</td>
-        <td>{{ log.timestamp|date:"Y-m-d H:i" }}</td>
-    </tr>
-    {% empty %}
-    <tr>
-        <td colspan="5">Немає записів у журналі</td>
-    </tr>
-    {% endfor %}
-</table>
+{% block crm_content %}
+<div class="container-fluid py-4 text-light">
+    <div class="card bg-dark text-light shadow border border-secondary">
+        <div class="card-body">
+            <h2 class="mb-4">Логи</h2>
+            <div class="table-responsive">
+                <table class="table table-dark table-striped table-bordered table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Дата</th>
+                            <th>Клієнт</th>
+                            <th>Дія</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs %}
+                        <tr>
+                            <td>{{ log.date|date:"Y-m-d H:i" }}</td>
+                            <td>{{ log.customer }}</td>
+                            <td>{{ log.action }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center">Логів поки що немає</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

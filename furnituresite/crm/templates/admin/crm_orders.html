@@ -1,42 +1,256 @@
-{% extends "admin/crm_base.html" %}
+{% extends "admin/base_site.html" %}
+{% load static %}
 
-{% block crm_content %}
-<h1>Замовлення CRM</h1>
+{% block extrahead %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+<script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 
-<form method="get" style="margin-bottom:20px; display:flex; gap:15px; flex-wrap:wrap;">
-    <select name="status">
-        <option value="">Всі статуси</option>
-        <option value="pending" {% if request.GET.status == "pending" %}selected{% endif %}>В обробці</option>
-        <option value="completed" {% if request.GET.status == "completed" %}selected{% endif %}>Завершено</option>
-    </select>
-    <input type="text" name="customer" placeholder="Клієнт" value="{{ request.GET.customer }}">
-    <input type="date" name="date_from" value="{{ request.GET.date_from }}">
-    <input type="date" name="date_to" value="{{ request.GET.date_to }}">
-    <button type="submit">Пошук</button>
-</form>
+<style>
+    #content {
+        padding: 20px;
+    }
+    .card {
+        background-color: #2a2f36;
+        border: 1px solid #444;
+        padding: 20px;
+        border-radius: 8px;
+    }
+    .form-control, .form-select {
+        background-color: #3d444c;
+        color: #fff;
+        border-color: #555;
+    }
+    .form-control:focus, .form-select:focus {
+        background-color: #3d444c;
+        color: #fff;
+        border-color: #0d6efd;
+        box-shadow: none;
+    }
 
-<table border="1" cellpadding="5" cellspacing="0" width="100%">
-    <tr>
-        <th>ID</th>
-        <th>Клієнт</th>
-        <th>Дата</th>
-        <th>Статус</th>
-    </tr>
-    {% for order in orders %}
-    <tr>
-        <td>{{ order.id }}</td>
-        <td>{{ order.customer }}</td>
-        <td>{{ order.date_ordered|date:"Y-m-d H:i" }}</td>
-        <td>
-            {% if order.complete %}
-                ✅ Завершено
-            {% else %}
-                ⏳ В обробці
-            {% endif %}
-        </td>
-    </tr>
-    {% empty %}
-    <tr><td colspan="4">Немає замовлень</td></tr>
-    {% endfor %}
-</table>
+    /* === ОСНОВНИЙ ФІКС ДЛЯ РОЗТАШУВАННЯ ФІЛЬТРІВ === */
+    .filters-wrapper {
+        display: flex;
+        flex-wrap: wrap; /* Дозволяє переносити на новий рядок на малих екранах */
+        gap: 15px; /* Відстань між елементами */
+        align-items: flex-end; /* Вирівнюємо елементи по нижньому краю */
+        margin-bottom: 25px;
+    }
+    .filter-item {
+        flex-grow: 1; /* Дозволяє елементам розтягуватись */
+    }
+    .filter-item.filter-item-date {
+        flex-basis: 300px; /* Задаємо базову ширину для поля з датою */
+    }
+    .filter-item-submit {
+        flex-grow: 0; /* Кнопка не буде розтягуватись */
+    }
+    /* ============================================== */
+
+    .table th a {
+        color: #a3c4ff;
+        text-decoration: none;
+    }
+    .table th a:hover {
+        text-decoration: underline;
+    }
+    /* Стилі для темної теми календаря */
+    .daterangepicker { background-color: #2a2f36 !important; border-color: #444 !important; }
+    .daterangepicker .calendar-table { background-color: #2a2f36 !important; }
+    .daterangepicker td.off, .daterangepicker td.off.in-range { background-color: #212529 !important; color: #6c757d !important; }
+    .daterangepicker .ranges li:hover { background-color: #0d6efd !important; }
+    .daterangepicker td.active, .daterangepicker td.active:hover { background-color: #0d6efd !important; }
+
+    /*Стиль для нової кнопки "Створити замовлення" */
+    .btn-create-order {
+        display: inline-flex;     /* Вирівнюємо іконку та текст */
+        align-items: center;
+        gap: 8px;                /* Відстань між іконкою та текстом */
+        padding: 10px 20px;
+        font-weight: 500;
+        color: #fff;
+        background: linear-gradient(90deg, #198754, #20c997);
+        border: none;
+        border-radius: 8px;
+        text-decoration: none;   /* Забираємо підкреслення у посилання */
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .btn-create-order:hover {
+        color: #fff;
+        transform: translateY(-2px); /* Ефект "підняття" кнопки */
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        background: linear-gradient(90deg, #157347, #17a589); /* Затемнення градієнту */
+    }
+
+    .btn-create-order svg {
+        width: 18px;
+        height: 18px;
+    }
+    /* Стиль для кнопки "Пошук" */
+        .btn-search {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        font-weight: 500;
+        color: #fff;
+        background-color: #0d6efd; /* Приємний синій колір */
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-search:hover {
+        background-color: #0b5ed7; /* Трохи темніший синій при наведенні */
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3); /* Легка тінь-світіння */
+    }
+
+    .btn-search svg {
+        width: 16px;
+        height: 16px;
+    }
+    /*  */
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">📦 Замовлення CRM</h2>
+        <a href="{% url 'crm_admin:crm-create-order' %}" class="btn-create-order">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+            </svg>
+            Створити замовлення
+        </a>
+    </div>
+
+    <form id="filterForm" method="get">
+        <div class="filters-wrapper">
+            <div class="filter-item">
+                <label for="statusFilter" class="form-label">Статус</label>
+                <select id="statusFilter" name="status" class="form-select">
+                    <option value="">Всі статуси</option>
+                    <option value="pending" {% if request.GET.status == "pending" %}selected{% endif %}>В обробці</option>
+                    <option value="completed" {% if request.GET.status == "completed" %}selected{% endif %}>Завершено</option>
+                </select>
+            </div>
+
+            <div class="filter-item">
+                <label for="customerFilter" class="form-label">Клієнт</label>
+                <input id="customerFilter" type="text" name="customer" placeholder="ПІБ або email" value="{{ request.GET.customer }}" class="form-control">
+            </div>
+
+            <div class="filter-item filter-item-date">
+                <label for="dateRangePicker" class="form-label">Період дати</label>
+                <input id="dateRangePicker" type="text" class="form-control" placeholder="Оберіть діапазон дат">
+                <input type="hidden" name="date_from" id="date_from" value="{{ request.GET.date_from }}">
+                <input type="hidden" name="date_to" id="date_to" value="{{ request.GET.date_to }}">
+            </div>
+
+            <div class="filter-item-submit">
+                <button type="submit" class="btn-search">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                </svg>
+                Пошук
+            </button>
+            </div>
+        </div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-dark table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Клієнт</th>
+                    <th>
+                        {% if current_sort == '-date_ordered' %}
+                            <a href="?sort=date_ordered&{{ request.GET.urlencode|cut:'sort=date_ordered'|cut:'sort=-date_ordered' }}">Дата ▼</a>
+                        {% else %}
+                            <a href="?sort=-date_ordered&{{ request.GET.urlencode|cut:'sort=date_ordered'|cut:'sort=-date_ordered' }}">Дата ▲</a>
+                        {% endif %}
+                    </th>
+                    <th>Статус</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.customer|default:"–" }}</td>
+                    <td>{{ order.date_ordered|date:"Y-m-d H:i" }}</td>
+                    <td>
+                        {% if order.complete %}
+                            <span class="badge bg-success">Завершено</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">В обробці</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center py-4">Немає замовлень за вашим запитом</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+// Переконуємось, що наш код виконається після завантаження jQuery
+$(function() {
+    $('#dateRangePicker').daterangepicker({
+        autoUpdateInput: false,
+        opens: 'left',
+        locale: {
+            "format": "YYYY-MM-DD",
+            "separator": " — ",
+            "applyLabel": "Прийняти",
+            "cancelLabel": "Скасувати",
+            "fromLabel": "Від",
+            "toLabel": "До",
+            "customRangeLabel": "Свій діапазон",
+            "daysOfWeek": ["Нд", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
+            "monthNames": ["Січень", "Лютий", "Березень", "Квітень", "Травень", "Червень", "Липень", "Серпень", "Вересень", "Жовтень", "Листопад", "Грудень"],
+            "firstDay": 1
+        },
+        ranges: {
+           'Сьогодні': [moment(), moment()],
+           'Вчора': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+           'Останні 7 днів': [moment().subtract(6, 'days'), moment()],
+           'Останні 30 днів': [moment().subtract(29, 'days'), moment()],
+           'Цей місяць': [moment().startOf('month'), moment().endOf('month')],
+           'Минулий місяць': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        }
+    });
+
+    $('#dateRangePicker').on('apply.daterangepicker', function(ev, picker) {
+        $(this).val(picker.startDate.format('YYYY-MM-DD') + ' — ' + picker.endDate.format('YYYY-MM-DD'));
+        $('#date_from').val(picker.startDate.format('YYYY-MM-DD'));
+        $('#date_to').val(picker.endDate.format('YYYY-MM-DD'));
+    });
+
+    $('#dateRangePicker').on('cancel.daterangepicker', function(ev, picker) {
+        $(this).val('');
+        $('#date_from').val('');
+        $('#date_to').val('');
+    });
+
+    // Показуємо раніше вибраний діапазон дат при завантаженні сторінки
+    const dateFrom = $('#date_from').val();
+    const dateTo = $('#date_to').val();
+    if (dateFrom && dateTo) {
+        $('#dateRangePicker').val(dateFrom + ' — ' + dateTo);
+    }
+});
+</script>
 {% endblock %}

@@ -1,20 +1,39 @@
+# crm/views.py
+
 from django.http import JsonResponse
 from django.db.models import Q, Sum, Count, F
 from django.db.models.functions import TruncMonth
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+import json
+
 from cart.models import Customer, Order, OrderItem, Interaction, UserActionLog
+from furniturestore.models import FurnitureProduct as Product
 
 
-
-
+# функція для відображення фільтрації та сортування замовлень
 def orders_view(request):
+    """
+    Відображає список замовлень з можливістю фільтрації та сортування.
+    """
+    # --- Сортування ---
+    # Отримуємо параметр сортування, за замовчуванням - новіші спочатку ('-date_ordered')
+    sort_order = request.GET.get('sort', '-date_ordered')
+    # Валідація параметра сортування для безпеки
+    if sort_order not in ['date_ordered', '-date_ordered']:
+        sort_order = '-date_ordered'
+
+    # --- Фільтрація ---
     status = request.GET.get("status")
     customer = request.GET.get("customer")
     date_from = request.GET.get("date_from")
     date_to = request.GET.get("date_to")
 
-    orders = Order.objects.all()
+    # Починаємо з усіх замовлень
+    orders = Order.objects.select_related('customer').all()
 
     if status == "pending":
         orders = orders.filter(complete=False)
@@ -29,10 +48,20 @@ def orders_view(request):
         )
 
     if date_from:
-        orders = orders.filter(date_ordered__gte=date_from)
+        orders = orders.filter(date_ordered__date__gte=date_from)
     if date_to:
-        orders = orders.filter(date_ordered__lte=date_to)
+        orders = orders.filter(date_ordered__date__lte=date_to)
 
+    # Застосовуємо сортування до відфільтрованого списку
+    orders = orders.order_by(sort_order)
+
+    # Передаємо дані в шаблон
+    context = {
+        "orders": orders,
+        "current_sort": sort_order,  # Передаємо поточний порядок сортування
+    }
+
+    # Ця частина може бути для старої AJAX-логіки, її можна залишити або видалити
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
         data = [
             {
@@ -45,7 +74,7 @@ def orders_view(request):
         ]
         return JsonResponse({"orders": data})
 
-    return render(request, "admin/crm_orders.html", {"orders": orders})
+    return render(request, "admin/crm_orders.html", context)
 
 
 @login_required
@@ -73,17 +102,7 @@ def logs_view(request):
 
 
 @login_required
-def crm_logs(request):
-    logs = UserActionLog.objects.select_related("user").order_by("-timestamp")
-    return render(request, "admin/crm_logs.html", {"logs": logs})
-
-
-@login_required
 def crm_analytics_view(request):
-    from django.db.models import Count, Sum, F
-    from django.db.models.functions import TruncMonth
-    from cart.models import OrderItem
-
     # Загальна статистика
     total_customers = Customer.objects.count()
     total_orders = Order.objects.count()
@@ -136,3 +155,43 @@ def crm_analytics_view(request):
         "top_products": top_products,
     })
 
+
+@login_required
+def create_order_view(request):
+    """Сторінка створення нового замовлення"""
+    customers = Customer.objects.all()
+    products = Product.objects.all()
+    return render(request, "admin/crm_order_create.html", {
+        "customers": customers,
+        "products": products,
+    })
+
+
+@csrf_exempt
+@require_POST
+@login_required
+def create_order_ajax(request):
+    """Обробка AJAX запиту на створення замовлення"""
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+
+        customer_id = data.get("customer")
+        items = data.get("items", [])
+
+        if not customer_id or not items:
+            return JsonResponse({"success": False, "error": "Невірні дані"})
+
+        customer = Customer.objects.get(id=customer_id)
+        order = Order.objects.create(customer=customer, complete=False, date_ordered=timezone.now())
+
+        for item in items:
+            product_id = item.get("product")
+            quantity = int(item.get("quantity", 1))
+
+            product = Product.objects.get(id=product_id)
+            OrderItem.objects.create(order=order, product=product, quantity=quantity)
+
+        return JsonResponse({"success": True, "order_id": order.id})
+
+    except Exception as e:
+        return JsonResponse({"success": False, "error": str(e)})
