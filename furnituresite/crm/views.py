@@ -1,5 +1,4 @@
 # crm/views.py
-
 from django.http import JsonResponse
 from django.db.models import Q, Sum, Count, F
 from django.db.models.functions import TruncMonth
@@ -32,8 +31,8 @@ def orders_view(request):
     date_from = request.GET.get("date_from")
     date_to = request.GET.get("date_to")
 
-    # Починаємо з усіх замовлень
-    orders = Order.objects.select_related('customer').all()
+    # Починаємо з усіх замовлень з пов'язаними даними
+    orders = Order.objects.select_related('customer').prefetch_related('orderitem_set__product').all()
 
     if status == "pending":
         orders = orders.filter(complete=False)
@@ -54,6 +53,13 @@ def orders_view(request):
 
     # Застосовуємо сортування до відфільтрованого списку
     orders = orders.order_by(sort_order)
+
+    # Додаємо розрахунок загальної вартості для кожного замовлення
+    for order in orders:
+        order.total_cost = order.orderitem_set.aggregate(
+            total=Sum(F('quantity') * F('product__price'))
+        )['total'] or 0
+        order.items_list = list(order.orderitem_set.all())
 
     # Передаємо дані в шаблон
     context = {
@@ -77,6 +83,88 @@ def orders_view(request):
     return render(request, "admin/crm_orders.html", context)
 
 
+@csrf_exempt
+@require_POST
+@login_required
+def update_order_status(request):
+    """Оновлення статусу замовлення через AJAX"""
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+        order_id = data.get("order_id")
+        new_status = data.get("status")
+
+        if not order_id or new_status is None:
+            return JsonResponse({"success": False, "error": "Невірні дані"})
+
+        order = get_object_or_404(Order, id=order_id)
+
+        # Конвертуємо статус
+        if new_status == "completed":
+            order.complete = True
+        elif new_status == "pending":
+            order.complete = False
+        else:
+            return JsonResponse({"success": False, "error": "Невірний статус"})
+
+        order.save()
+
+        # Логування дії
+        UserActionLog.objects.create(
+            user=request.user,
+            action_type="order_status_change",
+            description=f"Змінено статус замовлення #{order.id} на {'Завершено' if order.complete else 'В обробці'}"
+        )
+
+        return JsonResponse({
+            "success": True,
+            "new_status": "completed" if order.complete else "pending",
+            "status_display": "Завершено" if order.complete else "В обробці"
+        })
+
+    except Exception as e:
+        return JsonResponse({"success": False, "error": str(e)})
+
+
+@csrf_exempt
+@require_POST
+@login_required
+def bulk_order_action(request):
+    """Масові дії з замовленнями"""
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+        order_ids = data.get("order_ids", [])
+        action = data.get("action")
+
+        if not order_ids or not action:
+            return JsonResponse({"success": False, "error": "Невірні дані"})
+
+        orders = Order.objects.filter(id__in=order_ids)
+
+        if action == "mark_completed":
+            orders.update(complete=True)
+            action_desc = "Позначено як завершені"
+        elif action == "mark_pending":
+            orders.update(complete=False)
+            action_desc = "Позначено як в обробці"
+        else:
+            return JsonResponse({"success": False, "error": "Невірна дія"})
+
+        # Логування масової дії
+        UserActionLog.objects.create(
+            user=request.user,
+            action_type="bulk_order_action",
+            description=f"{action_desc}: замовлення {', '.join(map(str, order_ids))}"
+        )
+
+        return JsonResponse({
+            "success": True,
+            "message": f"{action_desc}: {len(order_ids)} замовлень"
+        })
+
+    except Exception as e:
+        return JsonResponse({"success": False, "error": str(e)})
+
+
 @login_required
 def customers_view(request):
     customers = Customer.objects.all()
@@ -97,8 +185,43 @@ def customer_detail_view(request, customer_id):
 
 @login_required
 def logs_view(request):
-    logs = UserActionLog.objects.select_related("user").order_by("-timestamp")[:200]
-    return render(request, "admin/crm_logs.html", {"logs": logs})
+    logs = UserActionLog.objects.select_related("user").all()
+
+    # --- Фільтрація ---
+    user_query = request.GET.get("user")
+    action_type = request.GET.get("action_type")
+    date_from = request.GET.get("date_from")
+    date_to = request.GET.get("date_to")
+
+    if user_query:
+        logs = logs.filter(user__username__icontains=user_query)
+
+    if action_type:
+        logs = logs.filter(action_type=action_type)
+
+    if date_from:
+        logs = logs.filter(timestamp__date__gte=date_from)
+
+    if date_to:
+        logs = logs.filter(timestamp__date__lte=date_to)
+
+    # --- Сортування ---
+    sort_order = request.GET.get("sort", "-timestamp")
+    if sort_order not in ["timestamp", "-timestamp", "user__username", "-user__username", "action_type",
+                          "-action_type"]:
+        sort_order = "-timestamp"
+
+    logs = logs.order_by(sort_order)
+
+    return render(request, "admin/crm_logs.html", {
+        "logs": logs[:200],  # останні 200
+        "current_sort": sort_order,
+        "current_user": user_query or "",
+        "current_action": action_type or "",
+        "date_from": date_from or "",
+        "date_to": date_to or "",
+        "action_choices": UserActionLog.ACTION_CHOICES,
+    })
 
 
 @login_required

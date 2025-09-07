@@ -4,6 +4,7 @@
 {{ block.super }}
 <style>
     #content { background-color: #1c1f23; }
+    .filter-form input, .filter-form select { margin-right: 10px; }
 </style>
 {% endblock %}
 
@@ -12,21 +13,58 @@
     <div class="card bg-dark text-light shadow border border-secondary">
         <div class="card-body">
             <h2 class="mb-4">Логи</h2>
+
+            <!-- 🔎 Фільтри -->
+            <form method="get" class="filter-form mb-3 d-flex flex-wrap align-items-center">
+                <input type="text" name="user" placeholder="Користувач" value="{{ current_user }}" class="form-control form-control-sm w-auto">
+                <select name="action_type" class="form-select form-select-sm w-auto">
+                    <option value="">Всі дії</option>
+                    {% for value,label in action_choices %}
+                        <option value="{{ value }}" {% if value == current_action %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <input type="date" name="date_from" value="{{ date_from }}" class="form-control form-control-sm w-auto">
+                <input type="date" name="date_to" value="{{ date_to }}" class="form-control form-control-sm w-auto">
+                <button type="submit" class="btn btn-sm btn-primary">Фільтрувати</button>
+                <a href="{% url 'crm_logs' %}" class="btn btn-sm btn-secondary ms-2">Скинути</a>
+            </form>
+
+            <!-- 📋 Таблиця логів -->
             <div class="table-responsive">
                 <table class="table table-dark table-striped table-bordered table-hover align-middle">
                     <thead>
                         <tr>
-                            <th>Дата</th>
-                            <th>Клієнт</th>
-                            <th>Дія</th>
+                            <th>
+                                <a href="?sort={% if current_sort == 'timestamp' %}-timestamp{% else %}timestamp{% endif %}">
+                                    Дата
+                                </a>
+                            </th>
+                            <th>
+                                <a href="?sort={% if current_sort == 'user__username' %}-user__username{% else %}user__username{% endif %}">
+                                    Користувач
+                                </a>
+                            </th>
+                            <th>
+                                <a href="?sort={% if current_sort == 'action_type' %}-action_type{% else %}action_type{% endif %}">
+                                    Дія
+                                </a>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for log in logs %}
                         <tr>
-                            <td>{{ log.date|date:"Y-m-d H:i" }}</td>
-                            <td>{{ log.customer }}</td>
-                            <td>{{ log.action }}</td>
+                            <td>{{ log.timestamp|date:"Y-m-d H:i" }}</td>
+                            <td>
+                                {% if log.user %}
+                                    {{ log.user.username }}
+                                {% else %}
+                                    Система
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ log.get_action_type_display }} — {{ log.description }}
+                            </td>
                         </tr>
                         {% empty %}
                         <tr>

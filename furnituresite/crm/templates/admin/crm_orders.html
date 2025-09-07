@@ -1,4 +1,4 @@
-{% extends "admin/base_site.html" %}
+{% extends "admin/crm_base.html" %}
 {% load static %}
 
 {% block extrahead %}
@@ -9,9 +9,21 @@
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 
 <style>
-    #content {
-        padding: 20px;
+    body, #container {
+        display: block !important;
     }
+
+    #container, #main, #content, #content.colM {
+        max-width: none !important;
+        width: 100% !important;
+        flex: none !important;
+    }
+
+    #content {
+        padding: 20px !important;
+        box-sizing: border-box !important;
+    }
+
     .card {
         background-color: #2a2f36;
         border: 1px solid #444;
@@ -29,26 +41,22 @@
         border-color: #0d6efd;
         box-shadow: none;
     }
-
-    /* === ОСНОВНИЙ ФІКС ДЛЯ РОЗТАШУВАННЯ ФІЛЬТРІВ === */
     .filters-wrapper {
         display: flex;
-        flex-wrap: wrap; /* Дозволяє переносити на новий рядок на малих екранах */
-        gap: 15px; /* Відстань між елементами */
-        align-items: flex-end; /* Вирівнюємо елементи по нижньому краю */
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: flex-end;
         margin-bottom: 25px;
     }
     .filter-item {
-        flex-grow: 1; /* Дозволяє елементам розтягуватись */
+        flex-grow: 1;
     }
     .filter-item.filter-item-date {
-        flex-basis: 300px; /* Задаємо базову ширину для поля з датою */
+        flex-basis: 300px;
     }
     .filter-item-submit {
-        flex-grow: 0; /* Кнопка не буде розтягуватись */
+        flex-grow: 0;
     }
-    /* ============================================== */
-
     .table th a {
         color: #a3c4ff;
         text-decoration: none;
@@ -56,74 +64,145 @@
     .table th a:hover {
         text-decoration: underline;
     }
-    /* Стилі для темної теми календаря */
     .daterangepicker { background-color: #2a2f36 !important; border-color: #444 !important; }
     .daterangepicker .calendar-table { background-color: #2a2f36 !important; }
     .daterangepicker td.off, .daterangepicker td.off.in-range { background-color: #212529 !important; color: #6c757d !important; }
     .daterangepicker .ranges li:hover { background-color: #0d6efd !important; }
     .daterangepicker td.active, .daterangepicker td.active:hover { background-color: #0d6efd !important; }
-
-    /*Стиль для нової кнопки "Створити замовлення" */
     .btn-create-order {
-        display: inline-flex;     /* Вирівнюємо іконку та текст */
-        align-items: center;
-        gap: 8px;                /* Відстань між іконкою та текстом */
-        padding: 10px 20px;
-        font-weight: 500;
-        color: #fff;
-        background: linear-gradient(90deg, #198754, #20c997);
-        border: none;
-        border-radius: 8px;
-        text-decoration: none;   /* Забираємо підкреслення у посилання */
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        transition: all 0.3s ease;
-    }
-
-    .btn-create-order:hover {
-        color: #fff;
-        transform: translateY(-2px); /* Ефект "підняття" кнопки */
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-        background: linear-gradient(90deg, #157347, #17a589); /* Затемнення градієнту */
-    }
-
-    .btn-create-order svg {
-        width: 18px;
-        height: 18px;
-    }
-    /* Стиль для кнопки "Пошук" */
-        .btn-search {
         display: inline-flex;
         align-items: center;
         gap: 8px;
         padding: 10px 20px;
         font-weight: 500;
         color: #fff;
-        background-color: #0d6efd; /* Приємний синій колір */
+        background: linear-gradient(90deg, #198754, #20c997);
+        border: none;
+        border-radius: 8px;
+        text-decoration: none;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+    }
+    .btn-create-order:hover {
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        background: linear-gradient(90deg, #157347, #17a589);
+    }
+    .btn-create-order svg {
+        width: 18px;
+        height: 18px;
+    }
+    .btn-search {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        font-weight: 500;
+        color: #fff;
+        background-color: #0d6efd;
         border: none;
         border-radius: 8px;
         cursor: pointer;
         transition: all 0.3s ease;
     }
-
     .btn-search:hover {
-        background-color: #0b5ed7; /* Трохи темніший синій при наведенні */
+        background-color: #0b5ed7;
         transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3); /* Легка тінь-світіння */
+        box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
     }
-
     .btn-search svg {
         width: 16px;
         height: 16px;
     }
-    /*  */
+    .status-dropdown {
+        background-color: #3d444c;
+        color: #fff;
+        border: 1px solid #555;
+        padding: 4px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .status-dropdown:focus {
+        outline: none;
+        border-color: #0d6efd;
+    }
+    .products-list {
+        margin-bottom: 8px;
+    }
+    .product-item {
+        background-color: #495057;
+        padding: 4px 8px;
+        border-radius: 4px;
+        margin: 2px;
+        display: inline-block;
+        font-size: 0.85em;
+    }
+    .show-more-btn {
+        background-color: #6c757d;
+        color: #fff;
+        border: none;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 0.75em;
+        cursor: pointer;
+        margin: 2px;
+    }
+    .show-more-btn:hover {
+        background-color: #5a6268;
+    }
+    .hidden-products {
+        display: none;
+    }
+    .bulk-actions {
+        background-color: #495057;
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 15px;
+        display: none;
+    }
+    .bulk-actions.show {
+        display: block;
+    }
+    .bulk-btn {
+        background-color: #6c757d;
+        color: #fff;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        margin-right: 10px;
+        cursor: pointer;
+        font-size: 0.9em;
+    }
+    .bulk-btn:hover {
+        background-color: #5a6268;
+    }
+    .bulk-btn.success {
+        background-color: #198754;
+    }
+    .bulk-btn.warning {
+        background-color: #ffc107;
+        color: #000;
+    }
+    .checkbox-col {
+        width: 40px;
+    }
+    .order-checkbox {
+        cursor: pointer;
+    }
+    .total-cost {
+        font-weight: bold;
+        color: #20c997;
+    }
 </style>
+
 {% endblock %}
 
-{% block content %}
+{% block crm_content %}
 <div class="card">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0">📦 Замовлення CRM</h2>
-        <a href="{% url 'crm_admin:crm-create-order' %}" class="btn-create-order">
+        <a href="{% url 'crm_create_order' %}" class="btn-create-order">
             <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
                 <path d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
             </svg>
@@ -165,10 +244,29 @@
         </div>
     </form>
 
+    <!-- Масові дії -->
+    <div class="bulk-actions" id="bulkActions">
+        <div class="d-flex align-items-center gap-3">
+            <span id="selectedCount">0</span> замовлень вибрано
+            <button class="bulk-btn success" onclick="bulkAction('mark_completed')">
+                Позначити як завершені
+            </button>
+            <button class="bulk-btn warning" onclick="bulkAction('mark_pending')">
+                Позначити як в обробці
+            </button>
+            <button class="bulk-btn" onclick="clearSelection()">
+                Скасувати вибір
+            </button>
+        </div>
+    </div>
+
     <div class="table-responsive">
         <table class="table table-dark table-hover align-middle">
             <thead>
                 <tr>
+                    <th class="checkbox-col">
+                        <input type="checkbox" id="selectAll" class="form-check-input order-checkbox">
+                    </th>
                     <th>ID</th>
                     <th>Клієнт</th>
                     <th>
@@ -178,26 +276,52 @@
                             <a href="?sort=-date_ordered&{{ request.GET.urlencode|cut:'sort=date_ordered'|cut:'sort=-date_ordered' }}">Дата ▲</a>
                         {% endif %}
                     </th>
+                    <th>Товари</th>
+                    <th>Вартість</th>
                     <th>Статус</th>
                 </tr>
             </thead>
             <tbody>
                 {% for order in orders %}
                 <tr>
+                    <td>
+                        <input type="checkbox" class="form-check-input order-checkbox"
+                               data-order-id="{{ order.id }}" onchange="updateBulkActions()">
+                    </td>
                     <td>{{ order.id }}</td>
                     <td>{{ order.customer|default:"–" }}</td>
                     <td>{{ order.date_ordered|date:"Y-m-d H:i" }}</td>
                     <td>
-                        {% if order.complete %}
-                            <span class="badge bg-success">Завершено</span>
-                        {% else %}
-                            <span class="badge bg-warning text-dark">В обробці</span>
-                        {% endif %}
+                        <div class="products-list">
+                            {% for item in order.items_list %}
+                                {% if forloop.counter <= 2 %}
+                                    <span class="product-item">
+                                        {{ item.product.name }} ({{ item.quantity }} шт.)
+                                    </span>
+                                {% else %}
+                                    <span class="product-item hidden-products" id="product-{{ order.id }}-{{ forloop.counter }}">
+                                        {{ item.product.name }} ({{ item.quantity }} шт.)
+                                    </span>
+                                {% endif %}
+                            {% endfor %}
+                            {% if order.items_list|length > 2 %}
+                                <button class="show-more-btn" onclick="toggleProducts({{ order.id }})">
+                                    +{{ order.items_list|length|add:"-2" }} ще
+                                </button>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td class="total-cost">{{ order.total_cost|floatformat:2 }} ₴</td>
+                    <td>
+                        <select class="status-dropdown" data-order-id="{{ order.id }}" onchange="updateOrderStatus(this)">
+                            <option value="pending" {% if not order.complete %}selected{% endif %}>В обробці</option>
+                            <option value="completed" {% if order.complete %}selected{% endif %}>Завершено</option>
+                        </select>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="4" class="text-center py-4">Немає замовлень за вашим запитом</td>
+                    <td colspan="7" class="text-center py-4">Немає замовлень за вашим запитом</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -252,5 +376,187 @@ $(function() {
         $('#dateRangePicker').val(dateFrom + ' — ' + dateTo);
     }
 });
+
+// Функція для показу/приховування товарів
+function toggleProducts(orderId) {
+    const hiddenProducts = document.querySelectorAll(`[id^="product-${orderId}-"]`);
+    const button = event.target;
+
+    hiddenProducts.forEach(product => {
+        if (product.style.display === 'none' || product.classList.contains('hidden-products')) {
+            product.style.display = 'inline-block';
+            product.classList.remove('hidden-products');
+        } else {
+            product.style.display = 'none';
+            product.classList.add('hidden-products');
+        }
+    });
+
+    if (button.textContent.includes('+')) {
+        button.textContent = 'Приховати';
+    } else {
+        const hiddenCount = hiddenProducts.length;
+        button.textContent = `+${hiddenCount} ще`;
+    }
+}
+
+// Функція для оновлення статусу замовлення
+function updateOrderStatus(selectElement) {
+    const orderId = selectElement.dataset.orderId;
+    const newStatus = selectElement.value;
+
+    fetch('{% url "crm_update_order_status" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            order_id: orderId,
+            status: newStatus
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Показуємо повідомлення про успіх
+            showNotification(`Статус замовлення #${orderId} оновлено`, 'success');
+        } else {
+            // Повертаємо попередній стан при помилці
+            showNotification('Помилка: ' + data.error, 'error');
+            location.reload(); // Перезавантажуємо сторінку для скидання стану
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Помилка при оновленні статусу', 'error');
+        location.reload();
+    });
+}
+
+// Функції для масових дій
+function updateBulkActions() {
+    const checkboxes = document.querySelectorAll('.order-checkbox[data-order-id]');
+    const checkedBoxes = document.querySelectorAll('.order-checkbox[data-order-id]:checked');
+    const bulkActions = document.getElementById('bulkActions');
+    const selectedCount = document.getElementById('selectedCount');
+    const selectAllCheckbox = document.getElementById('selectAll');
+
+    selectedCount.textContent = checkedBoxes.length;
+
+    if (checkedBoxes.length > 0) {
+        bulkActions.classList.add('show');
+    } else {
+        bulkActions.classList.remove('show');
+    }
+
+    // Оновлюємо стан checkbox "Вибрати все"
+    if (checkedBoxes.length === checkboxes.length) {
+        selectAllCheckbox.checked = true;
+        selectAllCheckbox.indeterminate = false;
+    } else if (checkedBoxes.length > 0) {
+        selectAllCheckbox.checked = false;
+        selectAllCheckbox.indeterminate = true;
+    } else {
+        selectAllCheckbox.checked = false;
+        selectAllCheckbox.indeterminate = false;
+    }
+}
+
+// Вибрати/скасувати вибір усіх
+document.getElementById('selectAll').addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.order-checkbox[data-order-id]');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+    });
+    updateBulkActions();
+});
+
+// Масова дія
+function bulkAction(action) {
+    const checkedBoxes = document.querySelectorAll('.order-checkbox[data-order-id]:checked');
+    const orderIds = Array.from(checkedBoxes).map(cb => cb.dataset.orderId);
+
+    if (orderIds.length === 0) {
+        showNotification('Виберіть замовлення для дії', 'warning');
+        return;
+    }
+
+    fetch('{% url "crm_bulk_order_action" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            order_ids: orderIds,
+            action: action
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification(data.message, 'success');
+            location.reload(); // Перезавантажуємо для оновлення статусів
+        } else {
+            showNotification('Помилка: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Помилка при виконанні дії', 'error');
+    });
+}
+
+// Скасувати вибір
+function clearSelection() {
+    const checkboxes = document.querySelectorAll('.order-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    updateBulkActions();
+}
+
+// Функція для отримання CSRF токена
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Функція для показу сповіщень
+function showNotification(message, type = 'info') {
+    // Створюємо елемент сповіщення
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'warning'} alert-dismissible fade show`;
+    notification.style.position = 'fixed';
+    notification.style.top = '20px';
+    notification.style.right = '20px';
+    notification.style.zIndex = '9999';
+    notification.style.minWidth = '300px';
+
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+
+    document.body.appendChild(notification);
+
+    // Автоматично видаляємо через 3 секунди
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 3000);
+}
 </script>
 {% endblock %}
