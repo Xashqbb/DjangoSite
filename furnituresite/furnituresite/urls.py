@@ -11,5 +11,8 @@ urlpatterns = [
     path('cart/', include('cart.urls')),
     path("crm-admin/", crm_admin_site.urls),
     path('crm/', include('crm.urls')),
+    path("contentgen/", include("contentgen.urls", namespace="contentgen")),
 ]
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

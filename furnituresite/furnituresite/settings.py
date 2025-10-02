@@ -2,17 +2,12 @@ import os
 from pathlib import Path
 from decouple import config
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Безпека
 SECRET_KEY = config("SECRET_KEY", default="unsafe-secret")
 DEBUG = config("DEBUG", default=False, cast=bool)
 ALLOWED_HOSTS = []
 
-
-
-# Installed apps
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -20,10 +15,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'main',
     'furniturestore',
     'cart',
     'crm',
+    'contentgen',
 
     'django_use_email_as_username.apps.DjangoUseEmailAsUsernameConfig',
     'custom_user.apps.CustomUserConfig',
@@ -61,7 +58,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'furnituresite.wsgi.application'
 
-# Database
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -69,7 +65,6 @@ DATABASES = {
     }
 }
 
-# Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -77,16 +72,20 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# I18N
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'Europe/Kiev'
+
+LANGUAGE_CODE = 'uk'
+TIME_ZONE = 'Europe/Kyiv'
 USE_I18N = True
 USE_TZ = True
 
-# Static & Media
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / "./main/static/main"]
-MEDIA_URL = ''
-MEDIA_ROOT = os.path.join(BASE_DIR, '')
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / 'main' / 'static' / 'main']
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+OPENAI_API_KEY = config("OPENAI_API_KEY", default="")
+OPENROUTER_API_KEY = config("OPENROUTER_API_KEY", default="")
+

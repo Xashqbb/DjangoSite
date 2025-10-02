@@ -3,6 +3,36 @@ from django.conf import settings
 from furniturestore.models import *
 from decimal import Decimal
 from django.utils import timezone
+from django.contrib.auth import get_user_model
+
+
+def get_system_user():
+    User = get_user_model()
+    username_field = User.USERNAME_FIELD
+
+    try:
+        if username_field == 'email':
+            user_credentials = {username_field: "system@example.com"}
+        else:
+            user_credentials = {username_field: "system"}
+
+        user, created = User.objects.get_or_create(
+            **user_credentials,
+            defaults={
+                "is_staff": True,
+                "is_active": True,
+            }
+        )
+        return user
+    except Exception as e:
+        print(f"Error creating system user: {e}")
+        return None
+
+def get_system_user_id():
+    """
+    Повертає ID системного користувача для використання у міграціях.
+    """
+    return get_system_user().id
 
 
 class Customer(models.Model):
@@ -97,18 +127,28 @@ class UserActionLog(models.Model):
         ("create", "Створення"),
         ("update", "Оновлення"),
         ("delete", "Видалення"),
-        ("status_change", "Зміна статусу"),
         ("login", "Вхід"),
         ("logout", "Вихід"),
+        ("order_created", "Створення замовлення"),
+        ("order_status_change", "Зміна статусу замовлення"),
+        ("bulk_order_action", "Масова дія з замовленнями"),
     ]
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
     action_type = models.CharField(max_length=50, choices=ACTION_CHOICES)
+    username = models.CharField(max_length=150, blank=True, null=True)
     description = models.TextField()
     timestamp = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f"[{self.timestamp}] {self.user} - {self.get_action_type_display()}"
+        user_display = self.user.username if hasattr(self.user, 'username') else "Система"
+        return f"[{self.timestamp}] {user_display} - {self.get_action_type_display()}"
 
 
 class Interaction(models.Model):
@@ -126,3 +166,4 @@ class Interaction(models.Model):
 
     def __str__(self):
         return f"{self.get_interaction_type_display()} з {self.customer} ({self.created_at.strftime('%Y-%m-%d %H:%M')})"
+

@@ -1,80 +1,219 @@
 {% extends "admin/crm_base.html" %}
+{% load static %}
 
 {% block extrahead %}
 {{ block.super }}
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+<script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+
 <style>
     #content { background-color: #1c1f23; }
-    .filter-form input, .filter-form select { margin-right: 10px; }
+
+    .card {
+        background-color: #2a2f36;
+        border: 1px solid #444;
+        border-radius: 8px;
+        padding: 20px;
+    }
+
+    .form-control, .form-select {
+        background-color: #3d444c;
+        color: #fff;
+        border-color: #555;
+    }
+
+    .form-control:focus, .form-select:focus {
+        background-color: #3d444c;
+        border-color: #0d6efd;
+        color: #fff;
+        box-shadow: none;
+    }
+
+    .filters-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: flex-end;
+        margin-bottom: 25px;
+    }
+
+    .filter-item { flex-grow: 1; }
+    .filter-item-date { flex-basis: 300px; }
+
+    .btn-search {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        font-weight: 500;
+        color: #fff;
+        background-color: #0d6efd;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-search:hover {
+        background-color: #0b5ed7;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+    }
+
+    .btn-reset {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        font-weight: 500;
+        color: #fff;
+        background-color: #6c757d;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-reset:hover {
+        background-color: #5a6268;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+    }
+
+    .table th a {
+        color: #a3c4ff;
+        text-decoration: none;
+    }
+    .table th a:hover { text-decoration: underline; }
+
+    .daterangepicker { background-color: #2a2f36 !important; border-color: #444 !important; }
+    .daterangepicker .calendar-table { background-color: #2a2f36 !important; }
+    .daterangepicker td.off, .daterangepicker td.off.in-range { background-color: #212529 !important; color: #6c757d !important; }
+    .daterangepicker .ranges li:hover { background-color: #0d6efd !important; }
+    .daterangepicker td.active, .daterangepicker td.active:hover { background-color: #0d6efd !important; }
 </style>
 {% endblock %}
 
 {% block crm_content %}
-<div class="container-fluid py-4 text-light">
-    <div class="card bg-dark text-light shadow border border-secondary">
-        <div class="card-body">
-            <h2 class="mb-4">Логи</h2>
+<div class="card">
+    <h2 class="mb-4">📜 Логи CRM</h2>
 
-            <!-- 🔎 Фільтри -->
-            <form method="get" class="filter-form mb-3 d-flex flex-wrap align-items-center">
-                <input type="text" name="user" placeholder="Користувач" value="{{ current_user }}" class="form-control form-control-sm w-auto">
-                <select name="action_type" class="form-select form-select-sm w-auto">
-                    <option value="">Всі дії</option>
-                    {% for value,label in action_choices %}
-                        <option value="{{ value }}" {% if value == current_action %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
-                <input type="date" name="date_from" value="{{ date_from }}" class="form-control form-control-sm w-auto">
-                <input type="date" name="date_to" value="{{ date_to }}" class="form-control form-control-sm w-auto">
-                <button type="submit" class="btn btn-sm btn-primary">Фільтрувати</button>
-                <a href="{% url 'crm_logs' %}" class="btn btn-sm btn-secondary ms-2">Скинути</a>
-            </form>
-
-            <!-- 📋 Таблиця логів -->
-            <div class="table-responsive">
-                <table class="table table-dark table-striped table-bordered table-hover align-middle">
-                    <thead>
-                        <tr>
-                            <th>
-                                <a href="?sort={% if current_sort == 'timestamp' %}-timestamp{% else %}timestamp{% endif %}">
-                                    Дата
-                                </a>
-                            </th>
-                            <th>
-                                <a href="?sort={% if current_sort == 'user__username' %}-user__username{% else %}user__username{% endif %}">
-                                    Користувач
-                                </a>
-                            </th>
-                            <th>
-                                <a href="?sort={% if current_sort == 'action_type' %}-action_type{% else %}action_type{% endif %}">
-                                    Дія
-                                </a>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for log in logs %}
-                        <tr>
-                            <td>{{ log.timestamp|date:"Y-m-d H:i" }}</td>
-                            <td>
-                                {% if log.user %}
-                                    {{ log.user.username }}
-                                {% else %}
-                                    Система
-                                {% endif %}
-                            </td>
-                            <td>
-                                {{ log.get_action_type_display }} — {{ log.description }}
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="3" class="text-center">Логів поки що немає</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+    <!-- 🔎 Фільтри -->
+    <form method="get" class="filters-wrapper">
+        <div class="filter-item">
+            <label for="userFilter" class="form-label">Користувач</label>
+            <input type="text" id="userFilter" name="user" placeholder="username" value="{{ current_user }}" class="form-control">
         </div>
+
+        <div class="filter-item">
+            <label for="actionTypeFilter" class="form-label">Дія</label>
+            <select id="actionTypeFilter" name="action_type" class="form-select">
+                <option value="">Всі дії</option>
+                {% for value,label in action_choices %}
+                    <option value="{{ value }}" {% if value == current_action %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="filter-item filter-item-date">
+            <label for="dateRangePicker" class="form-label">Період</label>
+            <input id="dateRangePicker" type="text" class="form-control" placeholder="Оберіть діапазон дат">
+            <input type="hidden" name="date_from" id="date_from" value="{{ date_from }}">
+            <input type="hidden" name="date_to" id="date_to" value="{{ date_to }}">
+        </div>
+
+        <div class="filter-item">
+            <button type="submit" class="btn-search">🔎 Пошук</button>
+            <a href="{% url 'crm_logs' %}" class="btn-reset">⟳ Скинути</a>
+        </div>
+    </form>
+
+    <!-- 📋 Таблиця логів -->
+    <div class="table-responsive">
+        <table class="table table-dark table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>
+                      <a href="?sort={% if current_sort == 'timestamp' %}-timestamp{% else %}timestamp{% endif %}&{{ request.GET.urlencode|cut:'sort=timestamp'|cut:'sort=-timestamp' }}">
+                        Дата
+                      </a>
+                    </th>
+                    <th>
+                      <a href="?sort={% if current_sort == 'user__username' %}-user__username{% else %}user__username{% endif %}&{{ request.GET.urlencode|cut:'sort=user__username'|cut:'sort=-user__username' }}">
+                        Користувач
+                      </a>
+                    </th>
+                    <th>
+                      <a href="?sort={% if current_sort == 'action_type' %}-action_type{% else %}action_type{% endif %}&{{ request.GET.urlencode|cut:'sort=action_type'|cut:'sort=-action_type' }}">
+                        Дія
+                      </a>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td>{{ log.timestamp|date:"Y-m-d H:i" }}</td>
+                    <td>{% if log.user %}{{ log.user.get_username }}{% else %}{{ log.username|default:'Система' }}{% endif %}</td>
+                    <td>{{ log.get_action_type_display }} — {{ log.description }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="text-center py-4">Логів поки що немає</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
+
+<script>
+$(function() {
+    $('#dateRangePicker').daterangepicker({
+        autoUpdateInput: false,
+        opens: 'left',
+        locale: {
+            "format": "YYYY-MM-DD",
+            "separator": " — ",
+            "applyLabel": "Прийняти",
+            "cancelLabel": "Скасувати",
+            "fromLabel": "Від",
+            "toLabel": "До",
+            "customRangeLabel": "Свій діапазон",
+            "daysOfWeek": ["Нд", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
+            "monthNames": ["Січень","Лютий","Березень","Квітень","Травень","Червень","Липень","Серпень","Вересень","Жовтень","Листопад","Грудень"],
+            "firstDay": 1
+        },
+        ranges: {
+           'Сьогодні': [moment(), moment()],
+           'Вчора': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+           'Останні 7 днів': [moment().subtract(6, 'days'), moment()],
+           'Останні 30 днів': [moment().subtract(29, 'days'), moment()],
+           'Цей місяць': [moment().startOf('month'), moment().endOf('month')],
+           'Минулий місяць': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        }
+    });
+
+    $('#dateRangePicker').on('apply.daterangepicker', function(ev, picker) {
+        $(this).val(picker.startDate.format('YYYY-MM-DD') + ' — ' + picker.endDate.format('YYYY-MM-DD'));
+        $('#date_from').val(picker.startDate.format('YYYY-MM-DD'));
+        $('#date_to').val(picker.endDate.format('YYYY-MM-DD'));
+    });
+
+    $('#dateRangePicker').on('cancel.daterangepicker', function() {
+        $(this).val('');
+        $('#date_from').val('');
+        $('#date_to').val('');
+    });
+
+    // відновлюємо вибраний діапазон при завантаженні
+    const dateFrom = $('#date_from').val();
+    const dateTo = $('#date_to').val();
+    if (dateFrom && dateTo) {
+        $('#dateRangePicker').val(dateFrom + ' — ' + dateTo);
+    }
+});
+</script>
 {% endblock %}
