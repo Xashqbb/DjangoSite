@@ -7,28 +7,6 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <style>
-        input[type="file"] {
-        color: #ddd;
-        background-color: #3d444c;
-        border: 1px solid #555;
-        border-radius: 6px;
-        padding: 6px;
-    }
-
-    input[type="file"]::file-selector-button {
-        background-color: #0d6efd;
-        color: #fff;
-        border: none;
-        border-radius: 6px;
-        padding: 6px 12px;
-        margin-right: 10px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-
-    input[type="file"]::file-selector-button:hover {
-        background-color: #0b5ed7;
-    }
     body {
         background-color: #1c1f23;
         color: #e3e9ef;
@@ -70,6 +48,51 @@
         box-shadow: none;
     }
 
+    /* Стиль для відключеного поля */
+    .form-control:disabled {
+        background-color: #2c3138;
+        color: #6c757d;
+        border-color: #444;
+        cursor: not-allowed;
+    }
+
+    /* Кастомізація input[type=file] */
+    input[type="file"] {
+        color: #ddd;
+        background-color: #3d444c;
+        border: 1px solid #555;
+        border-radius: 6px;
+        padding: 6px;
+    }
+    input[type="file"]::file-selector-button {
+        background-color: #0d6efd;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        padding: 6px 12px;
+        margin-right: 10px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    input[type="file"]::file-selector-button:hover {
+        background-color: #0b5ed7;
+    }
+
+    /* Чекбокс */
+    .form-check-input {
+        background-color: #3d444c;
+        border-color: #555;
+        cursor: pointer;
+    }
+    .form-check-input:checked {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+    .form-check-label {
+        color: #e3e9ef;
+        cursor: pointer;
+    }
+
     .btn-primary {
         display: inline-flex;
         align-items: center;
@@ -94,7 +117,6 @@
         color: #a3c4ff !important;
         text-decoration: none;
     }
-
     .link-light:hover {
         text-decoration: underline;
     }
@@ -102,17 +124,30 @@
 </head>
 <body>
   <div class="card">
-    <h3>Завантаження даних для генерації опису</h3>
+    <h3>Завантаження даних</h3>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="mb-3">
             <label class="form-label">Товар</label>
             {{ form.product }}
         </div>
-        <div class="mb-3">
-            <label class="form-label">Зображення (опціонально)</label>
-            {{ form.image }}
+
+        <div class="mb-3 p-3 border border-secondary rounded bg-dark bg-opacity-25">
+            <label class="form-label mb-2">Зображення</label>
+
+            <div class="mb-2">
+                {{ form.image }}
+            </div>
+
+            <div class="form-check mt-2">
+                {{ form.use_product_image }}
+
+                <label class="form-check-label" for="{{ form.use_product_image.id_for_label }}">
+                    Взяти фото з картки товару (якщо є)
+                </label>
+            </div>
         </div>
+
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label class="form-label">Колір</label>
@@ -133,11 +168,43 @@
                 {{ form.style }}
             </div>
         </div>
-        <button class="btn btn-primary">Створити чернетку</button>
+
+        <div class="d-flex align-items-center mt-4">
+            <button class="btn btn-primary">Створити чернетку</button>
+            <div class="ms-auto">
+                 <a class="link-light me-3" href="{% url 'contentgen:list' %}">Всі чернетки</a>
+                 <a class="link-light" href="/admin/">Адмін панель</a>
+            </div>
+        </div>
     </form>
-    <div class="mt-3">
-        <a class="link-light" href="/admin/">Перейти в адмінку</a>
-    </div>
   </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Ми залишаємо тут явні ID, оскільки ми їх жорстко задали у forms.py
+        // Але тепер Django гарантовано рендерить саме ці ID.
+        const checkbox = document.getElementById('id_use_product_image');
+        const fileInput = document.getElementById('id_image_input');
+
+        function toggleFileField() {
+            if (checkbox.checked) {
+                // Якщо галочка стоїть - блокуємо інпут і очищаємо його
+                fileInput.disabled = true;
+                fileInput.value = '';
+            } else {
+                // Якщо галочка знята - розблокуємо
+                fileInput.disabled = false;
+            }
+        }
+
+        if (checkbox && fileInput) {
+            checkbox.addEventListener('change', toggleFileField);
+            // Викликаємо функцію одразу, щоб встановити правильний стан при завантаженні сторінки
+            toggleFileField();
+        } else {
+            console.warn("Не вдалося знайти елементи форми за ID: id_use_product_image або id_image_input");
+        }
+    });
+  </script>
 </body>
 </html>

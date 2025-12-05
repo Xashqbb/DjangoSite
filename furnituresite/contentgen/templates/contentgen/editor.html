@@ -98,8 +98,20 @@
         border-radius: 8px;
     }
 
+    .btn-outline-secondary {
+        border-radius: 8px;
+        border-color: #6c757d;
+        color: #ccc;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #6c757d;
+        color: #fff;
+    }
+
     a, a:hover {
         color: #9ecbff;
+        text-decoration: none;
     }
 
     .badge {
@@ -121,7 +133,6 @@
       <h3>Редактор опису</h3>
       <div class="meta">
         Товар: <strong>{{ gen.product.name }}</strong><br>
-        Категорія з зображення: <em>{{ gen.detected_category|default:"—" }}</em><br>
         Статус: {{ gen.get_status_display }} | Створено: {{ gen.created_at|date:"Y-m-d H:i" }}<br>
         Джерело генерації:
         {% if gen.source == "OpenAI" %}
@@ -136,7 +147,13 @@
       </div>
 
       {% if gen.image %}
-        <img class="preview" src="{{ gen.image.url }}" alt="product image">
+        <img class="preview" src="{{ gen.image.url }}" alt="Gen image">
+      {% elif gen.product.image %}
+        <img class="preview" src="{{ gen.product.image.url }}" alt="Product main image">
+      {% else %}
+        <div class="text-center text-muted mb-3 p-3 border border-secondary rounded">
+           <small>Зображення відсутнє</small>
+        </div>
       {% endif %}
 
       <form method="post">
@@ -148,8 +165,18 @@
         <div class="form-check mb-3">
           {{ form.publish }} <label class="form-check-label">Опублікувати у картці товару</label>
         </div>
-        <button class="btn btn-primary">Зберегти</button>
-        <a class="btn btn-outline-light ms-2" href="{% url 'contentgen:upload' %}">Новий опис</a>
+
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary">Зберегти</button>
+
+            <a class="btn btn-outline-light" href="{% url 'contentgen:upload' %}">
+                Новий опис
+            </a>
+
+            <a class="btn btn-outline-secondary ms-auto" href="{% url 'contentgen:list' %}">
+                Всі чернетки
+            </a>
+        </div>
       </form>
     </div>
   </div>
