@@ -12,6 +12,7 @@ urlpatterns = [
     path("crm-admin/", crm_admin_site.urls),
     path('crm/', include('crm.urls')),
     path("contentgen/", include("contentgen.urls", namespace="contentgen")),
+    path('pricing/', include('dynamic_pricing.urls')),
 ]
 
 if settings.DEBUG:

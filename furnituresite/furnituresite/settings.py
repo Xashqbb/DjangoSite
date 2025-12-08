@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'cart',
     'crm',
     'contentgen',
+    'dynamic_pricing',
 
     'django_use_email_as_username.apps.DjangoUseEmailAsUsernameConfig',
     'custom_user.apps.CustomUserConfig',

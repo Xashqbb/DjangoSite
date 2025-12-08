@@ -21,6 +21,14 @@ class FurnitureProduct(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
     discount_price = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
     in_stock = models.BooleanField(default=True)
+    quantity = models.PositiveIntegerField(default=0, verbose_name="Кількість на складі")
+
+    def save(self, *args, **kwargs):
+        if self.quantity > 0:
+            self.in_stock = True
+        else:
+            self.in_stock = False
+        super(FurnitureProduct, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('product_detail', kwargs={'product_slug': self.slug})

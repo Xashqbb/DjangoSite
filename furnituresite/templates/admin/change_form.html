@@ -1,0 +1,211 @@
+{% extends 'admin/change_form.html' %}
+
+{% block after_field_sets %}
+    {{ block.super }}
+
+    {% if opts.app_label == 'furniturestore' and opts.model_name == 'furnitureproduct' %}
+
+        <style>
+            /* --- Основний контейнер віджету (Темна тема) --- */
+            .pricing-widget {
+                border: 1px solid #444; /* Темна рамка */
+                background: #1f2226; /* Темний фон, як в адмінці */
+                color: #e9ecef; /* Світлий текст */
+                padding: 25px;
+                margin: 30px 0;
+                border-radius: 8px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* М'яка тінь */
+            }
+
+            /* --- Заголовок та верхня частина --- */
+            .pricing-header {
+                display: flex;
+                align-items: center;
+                gap: 20px;
+                margin-bottom: 25px;
+                padding-bottom: 15px;
+                border-bottom: 2px solid #333; /* Розділювач */
+            }
+            .pricing-header h2 {
+                margin: 0;
+                color: #fff; /* Білий заголовок */
+                font-weight: 300;
+            }
+
+            /* --- Таблиця результатів --- */
+            .price-table {
+                width: 100%;
+                border-collapse: collapse;
+                background: #2c3036; /* Трохи світліший фон для таблиці */
+                margin-top: 15px;
+                border-radius: 5px;
+                overflow: hidden;
+            }
+            .price-table th, .price-table td {
+                border: 1px solid #444;
+                padding: 12px 15px;
+                text-align: center;
+                font-size: 1.1em;
+            }
+            .price-table th {
+                background: #3a3f47; /* Заголовок таблиці */
+                color: #adb5bd;
+                font-weight: 600;
+            }
+            .price-table tr:hover td {
+                background-color: #333840; /* Підсвітка рядка при наведенні */
+            }
+
+            /* --- Акцент на рекомендовану ціну --- */
+            .rec-price {
+                color: #2ecc71; /* Яскравий зелений */
+                font-weight: bold;
+                font-size: 1.4em;
+            }
+
+            /* --- Анімація спінера (завантаження) --- */
+            .loader {
+                border: 4px solid #333; /* Темний фон спінера */
+                border-top: 4px solid #3498db; /* Синій активний колір */
+                border-radius: 50%;
+                width: 28px;
+                height: 28px;
+                animation: spin 1s linear infinite;
+                display: none;
+            }
+            @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+            /* --- Стильна кнопка (Material Design style) --- */
+            .btn-check {
+                background-color: #0d6efd; /* Сучасний синій */
+                color: white;
+                padding: 12px 24px;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                font-weight: 600;
+                font-size: 14px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                transition: all 0.3s ease; /* Плавна анімація */
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            }
+            .btn-check:hover {
+                background-color: #0b5ed7; /* Темніший синій при наведенні */
+                box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+                transform: translateY(-1px);
+            }
+            .btn-check:disabled {
+                background-color: #6c757d;
+                cursor: not-allowed;
+                box-shadow: none;
+                transform: none;
+            }
+
+            /* --- Список конкурентів --- */
+            #competitorsList li {
+                margin-bottom: 5px;
+                color: #ced4da;
+            }
+            #competitorsList b {
+                color: #80bdff; /* Синій для назв сайтів */
+            }
+        </style>
+
+        <div class="pricing-widget">
+            <div class="pricing-header">
+                <h2 style="display: flex; align-items: center;">
+                    <span style="font-size: 1.5em; margin-right: 10px;">📊</span>
+                    Аналіз ціни
+                </h2>
+                <button type="button" id="checkPriceBtn" class="btn-check" onclick="checkPrices({{ original.pk }})">
+                    Отримати рекомендовані ціни
+                </button>
+                <div id="loader" class="loader"></div>
+            </div>
+
+            <div id="resultsArea" style="display: none;">
+                <p id="analysisMessage" style="font-style: italic; color: #adb5bd; margin-bottom: 15px; padding: 10px; background: #333; border-left: 4px solid #0d6efd;"></p>
+
+                <table class="price-table">
+                    <thead>
+                        <tr>
+                            <th>Моя ціна</th>
+                            <th>Мін. ринок</th>
+                            <th>Макс. ринок</th>
+                            <th>РЕКОМЕНДОВАНА</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td id="myPriceDisplay"></td>
+                            <td id="minPriceDisplay"></td>
+                            <td id="maxPriceDisplay"></td>
+                            <td id="recPriceDisplay" class="rec-price"></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div style="margin-top: 20px;">
+                    <strong style="color: #fff;">🔍 Знайдені джерела:</strong>
+                    <ul id="competitorsList" style="margin-top: 10px; padding-left: 20px; list-style-type: disc;"></ul>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        // JS код залишається тим самим, він працює добре
+        async function checkPrices(productId) {
+            if (!productId) {
+                alert('Спершу збережіть товар, щоб отримати ID!');
+                return;
+            }
+
+            const btn = document.getElementById('checkPriceBtn');
+            const loader = document.getElementById('loader');
+            const results = document.getElementById('resultsArea');
+
+            btn.disabled = true;
+            loader.style.display = 'block';
+            results.style.display = 'none';
+
+            try {
+                const response = await fetch(`/pricing/analyze/${productId}/`);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    document.getElementById('myPriceDisplay').innerText = data.current_my_price + ' грн';
+                    document.getElementById('minPriceDisplay').innerText = data.min + ' грн';
+                    document.getElementById('maxPriceDisplay').innerText = data.max + ' грн';
+                    document.getElementById('recPriceDisplay').innerText = data.recommended + ' грн';
+                    document.getElementById('analysisMessage').innerText = data.message;
+
+                    const list = document.getElementById('competitorsList');
+                    list.innerHTML = '';
+                    if (data.competitors.length > 0) {
+                        data.competitors.forEach(comp => {
+                            const li = document.createElement('li');
+                            li.innerHTML = `<b>${comp.source}</b>: ${comp.price} грн`;
+                            list.appendChild(li);
+                        });
+                    } else {
+                        list.innerHTML = '<li>Конкурентів не знайдено (або ціни не пройшли фільтр)</li>';
+                    }
+                    results.style.display = 'block';
+                } else {
+                    alert('Повідомлення: ' + data.message);
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Помилка: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                loader.style.display = 'none';
+            }
+        }
+        </script>
+
+    {% endif %}
+
+{% endblock %}
